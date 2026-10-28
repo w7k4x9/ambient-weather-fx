@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         🌧️ Crack Ambient Weather FX (시간대 배경 & 날씨 효과)
 // @namespace    crack-ambient-weather-fx
-// @version      2.9.0
-// @description  Crack 채팅방에 시간대 배경·화면 효과·장면 꾸미기·키워드 자동 전환·사운드·방별 BGM을 추가합니다.
+// @version      2.9.1
+// @description  Crack 채팅방에 시간대 배경·화면 효과·키워드 자동 전환·사운드·방별 BGM을 추가합니다.
 // @downloadURL  https://raw.githubusercontent.com/w7k4x9/ambient-weather-fx/main/AmbientWeatherFX.user.js
 // @updateURL    https://raw.githubusercontent.com/w7k4x9/ambient-weather-fx/main/AmbientWeatherFX.user.js
 // @match        https://crack.wrtn.ai/*
@@ -250,8 +250,9 @@
   // v2.8.0: power saver now also caps CAWF's own CSS animations at 30fps (the canvas effects already had low-power FPS budgets), and the shore effect drops its faintest back foam SVG (main/front foam unchanged) to cut per-frame SVG repaint cost.
   const SCRIPT_NAME = 'Crack Ambient Weather FX';
   // v2.6.4: liquid-glass settings UI, fixed status header and idle launcher animation.
-  // v2.9.0 (fork): 방별 BGM·방 효과음(YouTube), 장면 꾸미기 레이어(하늘·나뭇가지·빛), 시간대 미감지 시 불꽃놀이/보케가 숨던 문제, 이퀄라이저 CSS 선택자 오타, 패널 버전 표기 수정.
-  const VERSION = '2.9.0';
+  // v2.9.0 (fork): 방별 BGM·방 효과음(YouTube), 시간대 미감지 시 불꽃놀이/보케가 숨던 문제, 이퀄라이저 CSS 선택자 오타, 패널 버전 표기 수정.
+  // v2.9.1: 설정 창을 macOS 시스템 설정 스타일로 새로 짜고, 덧그린 장면 레이어를 없앴다. 시간을 모를 때 벚꽃·나비·나뭇잎·햇빛이면 원래 낮 하늘을 깐다.
+  const VERSION = '2.9.1';
   const STORE_KEY = 'cawf_settings_v1';
   const GUARD_KEY = '__CAWF_AMBIENT_WEATHER_FX_V257_LOADED__';
 
@@ -5548,7 +5549,7 @@
 
 `;
     style.textContent += "@property --cawfg-ang{syntax:\"<angle>\";inherits:false;initial-value:0deg}\n#cawf-panel,#cawf-floating-button{--accent:#6fa2ff;--accent-2:#9a86ff;  --st-bg:#141413;--st-ink:rgba(238,236,230,.9);--st-ink-2:rgba(238,236,230,.52);--st-line:rgba(255,255,255,.07);--st-bubble:rgba(255,255,255,.07);\n  --c-light:#fff;--c-dark:#000;--rl:.34;--rd:1.7;\n  --bg:color-mix(in srgb,#10131d 66%,transparent);--bg-solid:#151823;\n  --ink:#f2f4fa;--ink-2:rgba(226,232,248,.7);--ink-3:rgba(226,232,248,.44);\n  --line:rgba(255,255,255,.075);--fill:rgba(255,255,255,.05);--fill-2:rgba(255,255,255,.09);--fill-3:rgba(255,255,255,.16);\n  --track:rgba(255,255,255,.14);--knob:#fff;--ind:rgba(255,255,255,.14);--tip:#f2f4fa;--tip-ink:#11141c;\n  --ok:#7ddc9a;--warn:#ffb86e;--bad:#ff7a7a;\n  --spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.22,.61,.36,1);--liquid:cubic-bezier(.65,0,.25,1.25);\n  --lg:\n    inset 0 0 0 1px color-mix(in srgb,var(--c-light) calc(var(--rl)*12%),transparent),\n    inset 1.8px 3px 0 -2px color-mix(in srgb,var(--c-light) calc(var(--rl)*90%),transparent),\n    inset -2px -2px 0 -2px color-mix(in srgb,var(--c-light) calc(var(--rl)*80%),transparent),\n    inset -3px -8px 1px -6px color-mix(in srgb,var(--c-light) calc(var(--rl)*60%),transparent),\n    inset -.3px -1px 4px 0 color-mix(in srgb,var(--c-dark) calc(var(--rd)*12%),transparent),\n    inset -1.5px 2.5px 0 -2px color-mix(in srgb,var(--c-dark) calc(var(--rd)*20%),transparent),\n    inset 0 3px 4px -2px color-mix(in srgb,var(--c-dark) calc(var(--rd)*20%),transparent),\n    inset 2px -6.5px 1px -4px color-mix(in srgb,var(--c-dark) calc(var(--rd)*10%),transparent),\n    0 1px 5px 0 color-mix(in srgb,var(--c-dark) calc(var(--rd)*10%),transparent),\n    0 6px 16px 0 color-mix(in srgb,var(--c-dark) calc(var(--rd)*8%),transparent);\n  --lg-sm:\n    inset 0 0 0 1px color-mix(in srgb,var(--c-light) calc(var(--rl)*16%),transparent),\n    inset 1px 1.6px 0 -1px color-mix(in srgb,var(--c-light) calc(var(--rl)*70%),transparent),\n    inset -1px -1.6px 0 -1px color-mix(in srgb,var(--c-dark) calc(var(--rd)*12%),transparent),\n    0 1px 3px color-mix(in srgb,var(--c-dark) calc(var(--rd)*9%),transparent);\n  --well:inset 0 1px 3px color-mix(in srgb,var(--c-dark) calc(var(--rd)*16%),transparent),inset 0 0 0 1px var(--line);\n}\n#cawf-panel[data-theme=\"light\"],#cawf-floating-button[data-theme=\"light\"]{  --rl:1;--rd:1;\n  --bg:color-mix(in srgb,#f4f6fb 58%,transparent);--bg-solid:#f3f4f8;\n  --ink:#141822;--ink-2:rgba(20,24,34,.68);--ink-3:rgba(20,24,34,.45);\n  --line:rgba(16,22,40,.08);--fill:rgba(16,22,40,.04);--fill-2:rgba(16,22,40,.07);--fill-3:rgba(16,22,40,.12);\n  --track:rgba(16,22,40,.13);--ind:rgba(255,255,255,.95);--tip:#141822;--tip-ink:#fff;\n  --ok:#1f9d57;--warn:#c4680f;--bad:#d9423d;}\n/* ── floating button ─────────────────────── */\n#cawf-floating-button{position:absolute;right:18px;bottom:16px;z-index:6;width:50px;height:50px;border-radius:50%;border:0;padding:0;font-size:22px;display:grid;place-items:center;cursor:pointer;\n  background:color-mix(in srgb,#1a1e2b 52%,transparent);-webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);\n  box-shadow:var(--lg),0 14px 30px -10px rgba(0,0,0,.55);transition:transform .45s var(--spring),opacity .5s}\n#cawf-floating-button[data-theme=\"light\"]{background:color-mix(in srgb,#fff 55%,transparent)}\n#cawf-floating-button:hover{transform:translateY(-2px) scale(1.05)}\n#cawf-floating-button:active{transform:scale(.9)}\n#cawf-floating-button[data-faded=\"true\"]{opacity:.32}\n#cawf-floating-button[data-faded=\"true\"]:hover{opacity:1}\n#cawf-floating-button[data-active=\"true\"]::before{content:'';position:absolute;inset:-2px;border-radius:50%;padding:2px;background:conic-gradient(from var(--cawfg-ang),var(--accent),transparent 35%,var(--accent-2) 65%,transparent 85%,var(--accent));\n  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:cawfg-rot 4s linear infinite}\n#cawf-floating-button .dot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok),0 0 0 2px color-mix(in srgb,var(--st-bg) 60%,transparent);transform:scale(0);transition:transform .4s var(--spring)}\n#cawf-floating-button[data-audio=\"true\"] .dot{transform:scale(1)}\n#cawf-floating-button .ico{display:block;transition:transform .45s var(--spring)}\n#cawf-floating-button .ico.cawfg-pop{animation:cawfg-pop .5s var(--spring)}\n@keyframes cawfg-rot{to{--cawfg-ang:360deg}}\n@keyframes cawfg-pop{0%{transform:scale(.4) rotate(-20deg);opacity:0}100%{transform:none;opacity:1}}\n\n/* ── panel shell ─────────────────────────── */\n#cawf-panel{position:absolute;right:16px;bottom:78px;z-index:5;width:min(372px,calc(100% - 24px));max-height:min(700px,calc(100% - 96px));\n  display:flex;flex-direction:column;border-radius:26px;color:var(--ink);background:var(--bg);\n  -webkit-backdrop-filter:blur(26px) saturate(175%);backdrop-filter:blur(26px) saturate(175%);\n  box-shadow:var(--lg),0 30px 70px -14px rgba(0,0,0,.5);font-size:12px;line-height:1.35;overflow:hidden;isolation:isolate;\n  transform-origin:calc(100% - 26px) calc(100% + 40px);\n  transition:transform .6s var(--spring),opacity .3s ease,filter .4s ease}\n#cawf-panel[data-theme=\"light\"]{box-shadow:var(--lg),0 30px 60px -16px rgba(40,50,80,.38)}\n#cawf-panel[data-open=\"false\"]{transform:translate(6px,26px) scale(.18);opacity:0;filter:blur(10px);pointer-events:none;transition:transform .45s cubic-bezier(.5,0,.75,0),opacity .35s ease .08s,filter .35s}\nhtml[data-cawf-low-power=\"true\"] #cawf-panel,html[data-cawf-low-power=\"true\"] #cawf-floating-button{-webkit-backdrop-filter:none;backdrop-filter:none}\nhtml[data-cawf-low-power=\"true\"] #cawf-panel{background:var(--bg-solid)}\n\n#cawf-panel>*:not(.cawfg-spec){position:relative;z-index:1}\n#cawf-panel[data-anim=\"in\"] .stg{animation:cawfg-stgIn .6s var(--spring) both;animation-delay:calc(var(--i,0)*45ms + 80ms)}\n@keyframes cawfg-stgIn{from{opacity:0;transform:translateY(10px) scale(.98)}}\n#cawf-panel button{cursor:pointer}\n#cawf-panel :focus-visible{outline:2px solid var(--accent);outline-offset:1px}\n#cawf-panel [data-off=\"true\"]{opacity:.42;filter:saturate(.6);pointer-events:none;transition:opacity .3s}\n\n/* head */\n.cawfg-head{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}\n.cawfg-app{width:36px;height:36px;border-radius:12px;flex:none;display:grid;place-items:center;font-size:19px;\n  background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 42%,transparent),color-mix(in srgb,var(--accent-2) 30%,transparent));box-shadow:var(--lg-sm)}\n.cawfg-app span{display:block}\n.cawfg-app span.cawfg-pop{animation:cawfg-pop .5s var(--spring)}\n.cawfg-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}\n.cawfg-title strong{font-size:14.5px;font-weight:750;letter-spacing:-.015em}\n.cawfg-title small{font-size:10px;color:var(--ink-3)}\n.cawfg-ib{width:30px;height:30px;flex:none;border-radius:50%;border:0;padding:0;display:grid;place-items:center;color:var(--ink-2);background:var(--fill);box-shadow:var(--lg-sm);transition:transform .3s var(--spring),background .2s,color .2s}\n.cawfg-ib:hover{background:var(--fill-2);color:var(--ink)}\n.cawfg-ib:active{transform:scale(.86)}\n.cawfg-ib svg{width:15px;height:15px}\n.cawfg-ib.sm{width:26px;height:26px}\n.cawfg-ib.sm svg{width:13px;height:13px}\n.cawfg-ib[aria-expanded=\"true\"]{background:color-mix(in srgb,var(--accent) 28%,transparent);color:var(--ink)}\n.cawfg-ib[aria-expanded=\"true\"] svg{transform:rotate(60deg)}\n.cawfg-ib svg{transition:transform .4s var(--spring)}\n\n/* switch */\n.cawfg-sw{--w:38px;--h:22px;position:relative;flex:none;width:var(--w);height:var(--h);border:0;padding:0;border-radius:999px;background:var(--track);box-shadow:var(--well);transition:background .35s ease}\n.cawfg-sw>i{position:absolute;top:2px;left:2px;width:calc(var(--h) - 4px);height:calc(var(--h) - 4px);border-radius:999px;background:var(--knob);\n  box-shadow:0 2px 6px rgba(0,0,0,.28),inset 0 -1px 1px rgba(0,0,0,.08);transition:left .5s var(--spring),width .22s ease}\n.cawfg-sw[aria-checked=\"true\"]{background:linear-gradient(120deg,var(--accent),var(--accent-2))}\n.cawfg-sw[aria-checked=\"true\"]>i{left:calc(var(--w) - var(--h) + 2px)}\n.cawfg-sw:active>i{width:calc(var(--h) + 5px)}\n.cawfg-sw[aria-checked=\"true\"]:active>i{left:calc(var(--w) - var(--h) - 5px)}\n.cawfg-sw.lg{--w:46px;--h:27px}\n.cawfg-sw.sm{--w:30px;--h:18px}\n\n/* now card */\n.cawfg-now{margin:0 12px;padding:5px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 30px;gap:2px;align-items:center;border-radius:18px;background:var(--fill);box-shadow:var(--lg-sm);overflow:hidden}\n.cawfg-nt{display:flex;align-items:center;gap:6px;min-width:0;padding:5px 6px;border-radius:12px;transition:background .2s}\n.cawfg-nt:hover{background:var(--fill)}\n.cawfg-nt+.cawfg-nt{box-shadow:-1px 0 0 var(--line)}\n.cawfg-nt-ico{flex:none;width:22px;text-align:center;font-size:17px;line-height:1;position:relative}\n.cawfg-nt-t{display:flex;flex-direction:column;min-width:0}\n.cawfg-nt-t b{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-nt-t small{font-size:9.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-nt[data-state=\"warn\"] .cawfg-nt-t small{color:var(--warn)}\n.cawfg-nt[data-state=\"play\"] .cawfg-nt-t small{color:var(--ok)}\n.cawfg-flip{animation:cawfg-flip .5s var(--spring)}\n@keyframes cawfg-flip{from{opacity:0;transform:translateY(7px) scale(.94)}}\n.cawfg-now.scan::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 25%,color-mix(in srgb,var(--accent) 34%,transparent) 50%,transparent 75%);transform:translateX(-100%);animation:cawfg-sweep .9s var(--ease) forwards}\n.cawfg-now{position:relative}\n@keyframes cawfg-sweep{to{transform:translateX(100%)}}\n.cawfg-rescan.cawfg-spin svg{animation:cawfg-spin .8s var(--ease)}\n@keyframes cawfg-spin{to{transform:rotate(360deg)}}\n\n/* equalizer */\n.cawfg-eq{display:inline-flex;align-items:flex-end;gap:1.5px;height:10px}\n.cawfg-eq i{width:2.5px;height:30%;border-radius:1px;background:var(--ok)}\n.cawfg-eq[data-on=\"true\"] i{animation:cawfg-eq .9s ease-in-out infinite}\n.cawfg-eq[data-on=\"true\"] i:nth-child(2){animation-delay:-.3s;animation-duration:.7s}\n.cawfg-eq[data-on=\"true\"] i:nth-child(3){animation-delay:-.55s;animation-duration:1.1s}\n@keyframes cawfg-eq{0%,100%{height:25%}50%{height:100%}}\n\n/* quick row */\n.cawfg-quick{display:flex;gap:6px;padding:8px 12px 0}\n.cawfg-q{display:flex;align-items:center;gap:7px;min-height:34px;padding:4px 5px 4px 10px;border-radius:12px;background:var(--fill);box-shadow:var(--lg-sm);font-size:11.5px;font-weight:600;white-space:nowrap}\n.cawfg-q:first-child{flex:1}\n.cawfg-q>span{flex:1}\n\n/* segmented */\n.cawfg-seg{position:relative;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:2px;border-radius:10px;background:var(--fill);box-shadow:var(--well);isolation:isolate;flex:none}\n.cawfg-seg>button{position:relative;z-index:1;border:0;background:none;font-size:11px;color:var(--ink-2);padding:0 9px;height:24px;border-radius:8px;white-space:nowrap;transition:color .25s}\n.cawfg-seg>button[aria-pressed=\"true\"]{color:var(--ink);font-weight:650}\n.cawfg-seg-ind{position:absolute;z-index:0;top:2px;bottom:2px;left:2px;width:calc((100% - 4px)/var(--n,3));border-radius:8px;background:var(--ind);box-shadow:var(--lg-sm);transform:translateX(calc(var(--i,0)*100%));transition:transform .5s var(--spring)}\n.cawfg-seg.sm>button{height:22px;font-size:10.5px;padding:0 8px}\n\n/* tabs */\n.cawfg-tabs{position:relative;margin:10px 12px 0;padding:3px;display:grid;grid-template-columns:repeat(4,1fr);border-radius:15px;background:var(--fill);box-shadow:var(--well)}\n.cawfg-tab{position:relative;z-index:1;height:34px;border:0;background:none;color:var(--ink-2);font-size:12px;font-weight:650;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:12px;transition:color .25s}\n.cawfg-tab[aria-selected=\"true\"]{color:var(--ink)}\n.cawfg-tab .mark{width:6px;height:6px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn);display:none}\n.cawfg-tab[data-dirty=\"true\"] .mark{display:block}\n.cawfg-tab .cawfg-eq{display:none;height:9px}\n.cawfg-tab[data-playing=\"true\"] .cawfg-eq{display:inline-flex}\n.cawfg-tab-ind{position:absolute;z-index:0;top:3px;bottom:3px;left:3px;width:calc((100% - 6px)/4);border-radius:12px;background:var(--ind);box-shadow:var(--lg);transform:translateX(calc(var(--idx,0)*100%));transition:transform .55s var(--spring)}\n\n/* body & pages */\n.cawfg-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 12px 14px;scrollbar-width:thin;scrollbar-color:var(--fill-3) transparent;\n  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10px,#000 calc(100% - 12px),transparent);mask-image:linear-gradient(180deg,transparent 0,#000 10px,#000 calc(100% - 12px),transparent)}\n.cawfg-page{display:none}\n.cawfg-page[data-on=\"true\"]{display:block;animation:cawfg-pageIn .42s var(--ease)}\n.cawfg-page[data-on=\"true\"][data-dir=\"-1\"]{animation-name:cawfg-pageInL}\n@keyframes cawfg-pageIn{from{opacity:0;transform:translateX(16px)}}\n@keyframes cawfg-pageInL{from{opacity:0;transform:translateX(-16px)}}\n.cawfg-sh{display:flex;align-items:center;gap:8px;margin:0 2px 8px}\n.cawfg-sh b{font-size:12.5px;font-weight:750;white-space:nowrap}\n.cawfg-sh small{flex:1;min-width:0;font-size:10px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-sh+.cawfg-sh{margin-top:14px}\n.cawfg-gap{height:12px}\n\n/* mode chips */\n.cawfg-mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}\n.cawfg-m{position:relative;display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 10px;border:0;border-radius:13px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--line);text-align:left;overflow:hidden;transition:transform .3s var(--spring),background .25s,box-shadow .25s}\n.cawfg-m:hover{background:var(--fill-2)}\n.cawfg-m:active{transform:scale(.96)}\n.cawfg-m>span{font-size:16px;line-height:1}\n.cawfg-m b{display:block;font-size:12px;font-weight:700}\n.cawfg-m small{display:block;font-size:9.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-m>div{min-width:0}\n.cawfg-m[aria-pressed=\"true\"],.cawfg-chip[aria-pressed=\"true\"]{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 36%,transparent),color-mix(in srgb,var(--accent-2) 26%,transparent));\n  box-shadow:var(--lg-sm),0 0 0 1px color-mix(in srgb,var(--accent) 58%,transparent),0 6px 18px -8px var(--accent);color:var(--ink)}\n\n/* effect grid */\n.cawfg-fxgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px 5px}\n.cawfg-cap{display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:650;color:var(--ink-3);margin-top:3px}\n.cawfg-cap::after{content:'';flex:1;height:1px;background:var(--line)}\n.cawfg-chip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:48px;padding:5px 2px 3px;border:0;border-radius:12px;\n  background:var(--fill);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2);overflow:hidden;transition:transform .32s var(--spring),background .25s,color .2s,box-shadow .25s,opacity .3s}\n.cawfg-chip:hover{background:var(--fill-2);color:var(--ink);transform:translateY(-1px)}\n.cawfg-chip:active{transform:scale(.9)}\n.cawfg-chip-ico{font-size:17px;line-height:1;transition:transform .45s var(--spring),filter .3s,opacity .3s}\n.cawfg-chip[aria-pressed=\"true\"] .cawfg-chip-ico{transform:scale(1.14)}\n.cawfg-chip-lbl{font-size:10px;font-weight:650;white-space:nowrap}\n.cawfg-chip-tag{position:absolute;top:3px;right:4px;font-size:7.5px;font-weight:800;color:var(--ink-3);line-height:1}\n.cawfg-chip-snd{position:absolute;top:4px;left:4px;width:8px;height:8px;color:var(--ink-3)}\n.cawfg-chip-snd svg{display:block;width:8px;height:8px}\n.cawfg-chip[data-unavail=\"true\"] .cawfg-chip-ico{filter:grayscale(1);opacity:.45}\n.cawfg-chip[data-unavail=\"true\"] .cawfg-chip-lbl{opacity:.6}\n.cawfg-chip[data-detected=\"true\"]::before,.cawfg-period[data-detected=\"true\"]::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;z-index:2;pointer-events:none;\n  background:conic-gradient(from var(--cawfg-ang),var(--accent),transparent 30%,var(--accent-2) 55%,transparent 80%,var(--accent));\n  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:cawfg-rot 3s linear infinite}\n\n/* detail line */\n.cawfg-detail{margin-top:8px;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:14px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--line)}\n.cawfg-detail-ico{font-size:21px;line-height:1;flex:none}\n.cawfg-detail-m{flex:1;min-width:0}\n.cawfg-detail-m b{font-size:12px;font-weight:700}\n.cawfg-detail-m p{margin:2px 0 0;font-size:10px;color:var(--ink-3);line-height:1.4}\n.cawfg-pill{flex:none;font-size:9.5px;font-weight:750;padding:3px 8px;border-radius:999px;white-space:nowrap}\n.cawfg-pill.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}\n.cawfg-pill.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}\n.cawfg-pill.off{color:var(--ink-3);background:var(--fill-2)}\n\n/* tune card & rows */\n.cawfg-card{margin-top:8px;padding:2px 10px;border-radius:16px;background:var(--fill);box-shadow:var(--lg-sm)}\n.cawfg-row{display:flex;align-items:center;gap:10px;min-height:38px}\n.cawfg-card>.cawfg-row+.cawfg-row,.cawfg-card>.cawfg-rrow+.cawfg-rrow,.cawfg-card>.cawfg-row+.cawfg-rrow,.cawfg-card>.cawfg-rrow+.cawfg-row,.cawfg-card>.cawfg-acc .cawfg-row{border-top:1px solid var(--line)}\n.cawfg-rl{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:11.5px;font-weight:650}\n.cawfg-rl small{font-size:9.5px;font-weight:400;color:var(--ink-3)}\n.cawfg-rrow{display:flex;align-items:center;gap:8px;min-height:38px}\n.cawfg-rrow .cawfg-rl{flex:0 0 52px}\n.cawfg-rwrap{flex:1;min-width:0;position:relative;display:flex;align-items:center}\n.cawfg-rwrap[data-tick]::after{content:'';position:absolute;left:var(--tick);top:50%;width:2px;height:10px;margin:-5px 0 0 -1px;border-radius:1px;background:var(--ink-3);pointer-events:none;opacity:.6}\n.cawfg-out{flex:0 0 36px;text-align:right;font-size:11px;font-weight:650;font-variant-numeric:tabular-nums;color:var(--ink-2)}\n.cawfg-out.cawfg-bump{animation:cawfg-bump .3s var(--spring)}\n@keyframes cawfg-bump{50%{transform:scale(1.18);color:var(--ink)}}\n.cawfg-range{--p:50%;width:100%;height:24px;margin:0;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}\n.cawfg-range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2)) 0/var(--p) 100% no-repeat,var(--track);box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}\n.cawfg-range::-moz-range-track{height:6px;border-radius:999px;background:var(--track)}\n.cawfg-range::-moz-range-progress{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}\n.cawfg-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.32),inset 0 -1px 1px rgba(0,0,0,.08);transition:transform .3s var(--spring),box-shadow .3s}\n.cawfg-range::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.32);transition:transform .3s var(--spring)}\n.cawfg-range:active::-webkit-slider-thumb{transform:scale(1.3);box-shadow:0 2px 8px rgba(0,0,0,.3),0 0 0 6px color-mix(in srgb,var(--accent) 24%,transparent)}\n.cawfg-range:active::-moz-range-thumb{transform:scale(1.3)}\n\n/* accordion */\n.cawfg-acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s var(--ease)}\n.cawfg-acc>div{overflow:hidden;min-height:0}\n.cawfg-acc[data-open=\"true\"]{grid-template-rows:1fr}\n.cawfg-acc-h{display:flex;align-items:center;gap:6px;padding-top:8px;font-size:10px;font-weight:700;color:var(--ink-3)}\n\n/* time ribbon */\n.cawfg-rib{position:relative;margin:22px 2px 6px}\n.cawfg-rib-bar{position:relative;display:flex;height:24px;border-radius:12px;overflow:hidden;\n  background:linear-gradient(90deg,#0d1430 0%,#1a2250 20.8%,#b56a86 25%,#ffc08c 29.2%,#8cc6ea 39.6%,#7ab8e2 60.4%,#f0ae70 70.8%,#ff8a5a 76%,#7a4f8e 81.3%,#2c3474 84.4%,#141c3c 87.5%,#0d1430 100%);\n  box-shadow:var(--lg-sm)}\n.cawfg-rib-seg{position:relative;flex:var(--w) 1 0;min-width:0;border:0;padding:0;background:transparent;font-size:11px;line-height:24px;text-align:center;transition:background .25s}\n.cawfg-rib-seg+.cawfg-rib-seg{box-shadow:inset 1px 0 0 rgba(255,255,255,.3)}\n.cawfg-rib-seg:hover{background:rgba(255,255,255,.14)}\n.cawfg-rib-seg[aria-pressed=\"true\"]{background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 2px #fff}\n.cawfg-rib-seg span{filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}\n.cawfg-rib-ticks{display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--ink-3);font-variant-numeric:tabular-nums}\n.cawfg-rib-mark{position:absolute;top:-4px;height:32px;left:var(--x,50%);width:2px;margin-left:-1px;border-radius:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.28),0 0 10px rgba(255,255,255,.9);transition:left .8s var(--spring),opacity .3s;pointer-events:none}\n.cawfg-rib-mark b{position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);padding:1px 6px;border-radius:6px;font-size:9.5px;font-weight:750;white-space:nowrap;background:var(--tip);color:var(--tip-ink);font-variant-numeric:tabular-nums}\n\n\n.cawfg-rib-mark[hidden]{display:block;opacity:0}\n\n/* period tiles */\n.cawfg-periods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}\n.cawfg-period{position:relative;height:60px;border:0;border-radius:14px;padding:0;overflow:hidden;color:#fff;text-align:left;background:var(--sky);\n  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 3px 10px -4px rgba(0,0,0,.4);transition:transform .35s var(--spring),box-shadow .3s}\n.cawfg-period::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.46),transparent 72%);pointer-events:none}\n.cawfg-period:hover{transform:translateY(-2px)}\n.cawfg-period:active{transform:scale(.94)}\n.cawfg-period-ico{position:absolute;top:6px;left:8px;z-index:1;font-size:14px;line-height:1}\n.cawfg-period-t{position:absolute;left:8px;right:6px;bottom:6px;z-index:1;display:flex;flex-direction:column}\n.cawfg-period-t b{font-size:12px;font-weight:750;text-shadow:0 1px 2px rgba(0,0,0,.45)}\n.cawfg-period-t small{font-size:9px;opacity:.88;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px rgba(0,0,0,.45)}\n.cawfg-period[aria-pressed=\"true\"]{box-shadow:inset 0 0 0 2px #fff,0 0 0 2px color-mix(in srgb,var(--accent) 70%,transparent),0 8px 20px -8px var(--accent)}\n.cawfg-ck{position:absolute;top:6px;right:6px;z-index:1;width:18px;height:18px;border-radius:50%;background:#fff;color:#141822;display:grid;place-items:center;transform:scale(0);transition:transform .45s var(--spring)}\n.cawfg-ck svg{width:11px;height:11px}\n.cawfg-period[aria-pressed=\"true\"] .cawfg-ck{transform:scale(1)}\n\n/* keywords */\n.cawfg-kwgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}\n.cawfg-k{position:relative;display:flex;align-items:center;gap:4px;height:30px;padding:0 6px;border:0;border-radius:10px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2);font-size:10.5px;font-weight:650;white-space:nowrap;overflow:hidden;transition:transform .3s var(--spring),background .2s}\n.cawfg-k:hover{background:var(--fill-2)}\n.cawfg-k:active{transform:scale(.93)}\n.cawfg-k .i{font-size:12px}\n.cawfg-k .l{overflow:hidden;text-overflow:ellipsis}\n.cawfg-k .n{margin-left:auto;font-size:9px;color:var(--ink-3);font-variant-numeric:tabular-nums}\n.cawfg-k[aria-pressed=\"true\"]{color:var(--ink);background:color-mix(in srgb,var(--accent) 22%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent)}\n.cawfg-k[data-dirty=\"true\"]::after{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn)}\n.cawfg-ed{margin-top:8px;padding:9px 10px 10px;border-radius:16px;background:var(--fill);box-shadow:var(--lg-sm)}\n.cawfg-ed-h{display:flex;align-items:center;gap:6px}\n.cawfg-ed-h .i{font-size:15px}\n.cawfg-ed-h b{font-size:12px;font-weight:750}\n.cawfg-ed-h small{flex:1;font-size:10px;color:var(--ink-3);font-variant-numeric:tabular-nums}\n.cawfg-link{border:0;background:none;padding:2px 4px;font-size:10.5px;font-weight:650;color:var(--ink-2);border-radius:6px}\n.cawfg-link:hover{color:var(--ink);background:var(--fill-2)}\n.cawfg-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;max-height:128px;overflow-y:auto;padding:2px;scrollbar-width:thin}\n.cawfg-tag{display:inline-flex;align-items:center;gap:2px;height:23px;padding:0 3px 0 8px;border-radius:999px;background:var(--fill-2);box-shadow:inset 0 0 0 1px var(--line);font-size:10.5px;animation:cawfg-tagIn .35s var(--spring)}\n.cawfg-tag.out{animation:cawfg-tagOut .2s ease forwards}\n.cawfg-tag button{width:17px;height:17px;border:0;border-radius:50%;padding:0;background:none;color:var(--ink-3);font-size:12px;line-height:1;display:grid;place-items:center}\n.cawfg-tag button:hover{background:var(--fill-3);color:var(--ink)}\n@keyframes cawfg-tagIn{from{opacity:0;transform:scale(.6)}}\n@keyframes cawfg-tagOut{to{opacity:0;transform:scale(.5);width:0;padding:0;margin:0}}\n.cawfg-tag-in{flex:1 0 110px;min-width:110px;height:23px;border:0;border-radius:999px;padding:0 10px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);font-size:10.5px;outline:none}\n.cawfg-tag-in:focus{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 70%,transparent);background:var(--fill)}\n.cawfg-tag-in::placeholder,.cawfg-raw::placeholder,.cawfg-test input::placeholder,.cawfg-url input::placeholder{color:var(--ink-3)}\n.cawfg-raw{display:block;width:100%;min-height:128px;margin-top:8px;padding:8px 10px;border:0;border-radius:12px;resize:vertical;background:var(--fill);box-shadow:var(--well);font-size:11px;line-height:1.55;outline:none}\n.cawfg-raw:focus{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 70%,transparent)}\n.cawfg-test{margin-top:8px;padding:8px 10px;border-radius:14px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--line)}\n.cawfg-test label{display:block;font-size:10px;font-weight:700;color:var(--ink-3);margin-bottom:5px}\n.cawfg-test input{width:100%;height:30px;border:0;border-radius:9px;padding:0 10px;background:var(--fill);box-shadow:var(--well);font-size:11px;outline:none}\n.cawfg-test input:focus{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 70%,transparent)}\n.cawfg-test-out{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:6px;min-height:20px;font-size:10.5px;color:var(--ink-3)}\n.cawfg-test-out .r{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-weight:700;color:var(--ink);background:color-mix(in srgb,var(--accent) 22%,transparent);animation:cawfg-tagIn .35s var(--spring)}\n.cawfg-test-out mark{background:color-mix(in srgb,var(--warn) 26%,transparent);color:var(--ink);padding:1px 5px;border-radius:5px}\n\n/* sound */\n.cawfg-lock{display:flex;align-items:center;gap:9px;padding:8px 8px 8px 10px;border-radius:15px;background:color-mix(in srgb,var(--warn) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--warn) 32%,transparent);transition:background .4s,box-shadow .4s}\n.cawfg-lock[data-state=\"open\"]{background:color-mix(in srgb,var(--ok) 11%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 30%,transparent)}\n.cawfg-lock-ico{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent)}\n.cawfg-lock[data-state=\"open\"] .cawfg-lock-ico{color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent)}\n.cawfg-lock-ico svg{width:15px;height:15px}\n.cawfg-lock-ico.cawfg-pop svg{animation:cawfg-pop .5s var(--spring)}\n.cawfg-lock-t{flex:1;min-width:0}\n.cawfg-lock-t b{display:block;font-size:11.5px;font-weight:750}\n.cawfg-lock-t small{display:block;font-size:9.5px;color:var(--ink-3)}\n.cawfg-tgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}\n.cawfg-tt{display:flex;align-items:center;gap:6px;padding:7px 7px 7px 10px;border-radius:13px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--line)}\n.cawfg-tt>span{flex:1;min-width:0}\n.cawfg-tt b{display:block;font-size:11px;font-weight:700;white-space:nowrap}\n.cawfg-tt small{display:block;font-size:9px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-mixer{margin-top:8px;padding:3px 8px;border-radius:16px;background:var(--fill);box-shadow:var(--lg-sm)}\n.cawfg-mx+.cawfg-mx{border-top:1px solid var(--line)}\n.cawfg-mx-row{display:grid;grid-template-columns:30px 62px minmax(0,1fr) 34px 26px;align-items:center;gap:6px;min-height:44px}\n.cawfg-mx-ico{position:relative;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:15px;background:var(--fill-2);transition:background .35s,box-shadow .35s}\n.cawfg-mx[data-state=\"play\"] .cawfg-mx-ico{background:color-mix(in srgb,var(--accent) 26%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 50%,transparent),0 4px 12px -4px var(--accent)}\n.cawfg-mx-ico .cawfg-eq{position:absolute;right:2px;bottom:2px;height:8px;opacity:0;transition:opacity .3s}\n.cawfg-mx-ico .cawfg-eq i{width:2px}\n.cawfg-mx[data-state=\"play\"] .cawfg-mx-ico .cawfg-eq{opacity:1}\n.cawfg-mx-n{min-width:0}\n.cawfg-mx-n b{display:block;font-size:11.5px;font-weight:700;white-space:nowrap}\n.cawfg-mx-n small{display:block;font-size:9px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.cawfg-mx[data-state=\"play\"] .cawfg-mx-n small{color:var(--ok)}\n.cawfg-mx[data-state=\"lock\"] .cawfg-mx-n small{color:var(--warn)}\n.cawfg-url{padding:2px 0 10px 36px;display:flex;flex-direction:column;gap:6px}\n.cawfg-url small{font-size:9.5px;color:var(--ink-3);line-height:1.45}\n.cawfg-url small a{color:var(--ink-2)}\n.cawfg-url input{width:100%;height:28px;border:0;border-radius:9px;padding:0 9px;background:var(--fill);box-shadow:var(--well);font-size:10.5px;outline:none}\n.cawfg-url input:focus{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 70%,transparent)}\n.cawfg-url-btns{display:flex;gap:5px}\n\n/* buttons */\n.cawfg-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 12px;border:0;border-radius:10px;font-size:11.5px;font-weight:700;color:var(--ink);background:var(--fill);box-shadow:var(--lg-sm);white-space:nowrap;transition:transform .3s var(--spring),background .2s,color .2s}\n.cawfg-btn:hover{background:var(--fill-2);transform:translateY(-1px)}\n.cawfg-btn:active{transform:scale(.94)}\n.cawfg-btn svg{width:13px;height:13px}\n.cawfg-btn.sm{height:26px;padding:0 10px;font-size:10.5px}\n.cawfg-btn.primary{color:#fff;background:linear-gradient(120deg,var(--accent),var(--accent-2));box-shadow:var(--lg-sm),0 6px 16px -6px var(--accent)}\n.cawfg-btn.primary::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s var(--ease)}\n.cawfg-btn.primary:hover::before{transform:translateX(120%)}\n.cawfg-btn[disabled]{opacity:.45;pointer-events:none}\n.cawfg-btn .cnt{min-width:16px;height:16px;padding:0 4px;border-radius:8px;font-size:9.5px;line-height:16px;background:rgba(255,255,255,.28)}\n.cawfg-btn[data-armed=\"true\"]{color:#fff;background:color-mix(in srgb,var(--bad) 78%,transparent)}\n.cawfg-btn .bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:#fff;transform-origin:left;transform:scaleX(0)}\n.cawfg-btn[data-armed=\"true\"] .bar{animation:cawfg-countdown 3s linear forwards}\n@keyframes cawfg-countdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}\n#cawf-panel .cawfg-ripple{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;opacity:.22;transform:scale(0);animation:cawfg-ripple .6s var(--ease) forwards}\n@keyframes cawfg-ripple{to{transform:scale(1);opacity:0}}\n\n/* footer */\n.cawfg-foot{display:flex;align-items:center;gap:6px;padding:9px 12px 12px;border-top:1px solid var(--line)}\n.cawfg-foot [data-foot]{display:none;gap:6px;margin-left:auto}\n.cawfg-foot [data-foot][data-on=\"true\"]{display:flex;animation:cawfg-pageIn .35s var(--ease)}\n.cawfg-saved{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-3);white-space:nowrap}\n.cawfg-saved svg{width:12px;height:12px}\n.cawfg-saved.pulse{color:var(--ok)}\n.cawfg-saved.pulse svg{animation:cawfg-pop .5s var(--spring)}\n.cawfg-foot[data-kw=\"true\"] .cawfg-saved{display:none}\n\n\n/* The header/status/navigation never participate in flex shrinking. */\n#cawf-panel{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(78px,env(safe-area-inset-bottom));z-index:2147482601;width:min(372px,calc(100vw - 24px));max-height:min(700px,calc(100dvh - 96px));display:none;font-family:Pretendard,-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",system-ui,sans-serif;box-sizing:border-box}\n#cawf-panel[data-open=\"true\"]{display:flex}\n#cawf-panel>header,#cawf-panel>.cawfg-now,#cawf-panel>.cawfg-quick,#cawf-panel>nav,#cawf-panel>footer{flex:0 0 auto}\n#cawf-panel>.cawfg-now{min-height:50px;overflow:visible}\n#cawf-panel .cawfg-nt{min-height:40px}\n#cawf-panel .cawfg-nt-ico{line-height:22px}\n#cawf-panel .cawfg-nt-t{gap:2px;line-height:1.4}\n#cawf-panel .cawfg-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-mask-image:none;mask-image:none}\n#cawf-panel *,#cawf-panel *::before,#cawf-panel *::after{box-sizing:border-box}\n#cawf-panel button,#cawf-panel input,#cawf-panel textarea{font-family:inherit;color:inherit}\n#cawf-panel button{cursor:pointer}\n#cawf-panel [hidden]{display:none!important}\n#cawf-panel .cawfg-page[data-on=\"true\"]{display:block}\n#cawf-panel .cawfg-page:not([data-on=\"true\"]){display:none}\n#cawf-panel .cawfg-acc[data-cawf-galaxy-options]{display:block}\n#cawf-panel .cawfg-seg button[aria-pressed=\"true\"]{color:var(--ink)}\n#cawf-panel .cawfg-raw{color:var(--ink)}\n#cawf-panel .cawfg-url input{color:var(--ink);min-width:0}\n#cawf-panel .cawfg-mx-row{list-style:none;padding:4px 0;cursor:default}\n#cawf-panel .cawfg-mx-row::-webkit-details-marker{display:none}\n#cawf-panel .cawfg-mx-row::marker{content:''}\n#cawf-panel .cawfg-mx-n{font-size:11.5px;font-weight:700}\n#cawf-panel .cawfg-mx[open] .cawfg-ib{background:var(--fill-3)}\n#cawf-panel .cawfg-foot{flex-wrap:wrap;min-height:48px}\n#cawf-panel .cawfg-foot[data-kw=\"true\"]>[data-cawf-reset]{display:none}\n#cawf-panel .cawfg-foot [data-foot=\"kw\"]{flex-wrap:wrap}\n#cawf-panel .cawfg-rib-mark b{max-width:80px}\n#cawf-panel .cawfg-rib-mark::after{content:none;animation:none}\n#cawf-panel .cawfg-nt-t b{font-size:11.5px}\n#cawf-panel .cawfg-chip-lbl{font-size:10px}\n#cawf-panel .cawfg-q{min-width:0}\n#cawf-panel .cawfg-tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}\n#cawf-panel .cawfg-tt{min-width:0}\n#cawf-panel .cawfg-tt b{white-space:normal}\n#cawf-panel .cawfg-sw{padding:0;color:var(--ink)}\n#cawf-panel .cawfg-btn.primary{color:#fff}\n#cawf-panel .cawfg-period{color:#fff}\n#cawf-panel .cawfg-rib-seg{color:#fff}\n#cawf-panel .cawfg-title strong{white-space:nowrap}\n#cawf-floating-button{position:fixed;left:0;top:0;right:auto;bottom:auto;z-index:2147482600;width:50px;height:50px;display:none;touch-action:none;color:var(--ink);line-height:1;box-sizing:border-box}\n#cawf-floating-button[data-visible=\"true\"]{display:grid}\n#cawf-floating-button[data-active=\"true\"]::before{animation-play-state:running;pointer-events:none}\n#cawf-floating-button[data-faded=\"true\"]:not(:hover):not(:focus-visible):not([data-panel-open=\"true\"])::before{animation-play-state:paused}\n#cawf-floating-button[data-panel-open=\"true\"],#cawf-floating-button:focus-visible{opacity:1}\n#cawf-floating-button[data-audio=\"true\"]::after{content:'';position:absolute;right:6px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}\n#cawf-floating-button:focus-visible{outline:2px solid var(--accent);outline-offset:4px}\n@media(max-width:420px){#cawf-panel{right:8px;width:calc(100vw - 16px)}#cawf-panel .cawfg-head{gap:7px;padding-left:12px;padding-right:12px}#cawf-panel .cawfg-title small{font-size:9px}#cawf-panel .cawfg-quick{gap:5px}#cawf-panel .cawfg-q{gap:4px;padding-left:7px;font-size:10.5px}#cawf-panel .cawfg-seg.sm>button{padding:0 6px}}\n@media(max-height:520px){#cawf-panel{top:max(8px,env(safe-area-inset-top));bottom:auto;max-height:calc(100dvh - 16px)}#cawf-panel .cawfg-head{padding-top:8px;padding-bottom:6px}#cawf-panel .cawfg-foot{padding-top:6px;padding-bottom:6px}}\n@media(prefers-reduced-motion:reduce){#cawf-panel *,#cawf-panel *::before,#cawf-panel *::after,#cawf-floating-button,#cawf-floating-button::before{animation:none!important;transition:none!important}}\n";
-    style.textContent += SCENE_CSS + ROOM_PANEL_CSS;
+    style.textContent += MAC_CSS;
     document.head.appendChild(style);
     state.lastAppliedGeom = null;
   }
@@ -5586,7 +5587,7 @@
 
     state.root = root;
     root.setAttribute('data-cawf-low-power', IS_LOW_POWER ? 'true' : 'false');
-    ensureSceneLayer(root);
+    root.querySelectorAll('#cawf-scene, #cawf-scene-front').forEach(el => el.remove());
     state.rainCanvas = root.querySelector(`#${IDS.rainCanvas}`);
     state.rainCtx = state.rainCanvas instanceof HTMLCanvasElement ? state.rainCanvas.getContext('2d') : null;
     state.timeLayer = root.querySelector(`#${IDS.timeLayer}`);
@@ -5927,7 +5928,7 @@
     }
   }
 
-  function setPanelTab(page) {
+  function setPanelTab_legacy(page) {
     const panel = state.panel;
     if (!panel) return;
     const normalized = ['fx', 'time', 'kw', 'snd'].includes(page) ? page : 'fx';
@@ -6114,7 +6115,6 @@ function panelHTML(){
           <div class="cawfg-row"><span class="cawfg-rl" data-cawf-intensity-label>효과 양</span>${seg('intensity', [['low','적게'],['medium','보통'],['high','많이']])}</div>
           ${range('effectOpacity', '투명도', .12, 1.5, .01)}
           ${range('effectSpeed', '속도', .2, 1.75, .01)}
-          <div class="cawfg-row"><span class="cawfg-rl">장면 꾸미기<small>하늘·구름·나뭇가지·빛을 효과에 맞춰 깔아요</small></span>${sw('sceneEnabled', '장면 꾸미기')}</div>
           <div class="cawfg-acc" data-cawf-galaxy-options hidden><div>
             <div class="cawfg-acc-h">🌌 은하수 전용</div>
             <div class="cawfg-row"><span class="cawfg-rl">유성<small>5~11초 간격으로 지나가요</small></span>${sw('galaxyMeteors', '은하수 유성')}</div>
@@ -6169,8 +6169,7 @@ function panelHTML(){
     </section>
 
     <section class="cawfg-page" data-cawf-page="snd" role="tabpanel">
-      ${roomBgmPanelHTML()}
-      <div class="cawfg-sh" style="margin-top:16px"><b>효과음</b><small>방 배경 소리와 효과 연동 소리</small>${sw('soundEnabled', '사운드 사용')}</div>
+      <div class="cawfg-sh"><b>사운드</b><small>효과에 맞춰 자동으로 켜고 꺼요</small>${sw('soundEnabled', '사운드 사용')}</div>
       <div data-dim="soundEnabled">
         <div class="cawfg-lock" data-lock>
           <span class="cawfg-lock-ico" data-lock-ico>${ICON.lock}</span>
@@ -6181,7 +6180,6 @@ function panelHTML(){
           <div class="cawfg-tt"><span><b>효과와 연동</b><small>맞는 효과일 때만 재생</small></span>${sw('audioFollowEffect', '효과와 연동', 'sm')}</div>
           <div class="cawfg-tt"><span><b>숨김 중 재생</b><small>다른 탭을 보는 동안에도</small></span>${sw('audioWhileHidden', '탭 숨김 중 재생', 'sm')}</div>
         </div>
-        ${roomSfxPanelHTML()}
         <div class="cawfg-mixer">${mixer}</div>
       </div>
     </section>
@@ -6197,11 +6195,11 @@ function panelHTML(){
   </footer>`;
 }
 
-return { panelHTML, EF, TM, ICON, esc };
+return { panelHTML, EF, TM, ICON, esc, EFFECTS, CLUSTERS, TIMES };
 })();
 
   let glassThemeObserver = null;
-  function positionGlassPanel() {
+  function positionGlassPanel_legacy() {
     const panel = state.panel, button = state.button;
     if (!panel || panel.getAttribute('data-open') !== 'true' || !button) return;
     const viewport = window.visualViewport;
@@ -6312,7 +6310,7 @@ return { panelHTML, EF, TM, ICON, esc };
     out.textContent = (found || '효과 키워드 없음') + (minutes == null ? '' : ` · ${EFFECT_LABELS[classifyMinutesToTimeEffect(minutes)]}`);
   }
 
-  function setupGlassPanel(panel) {
+  function setupGlassPanel_legacy(panel) {
     window.addEventListener('resize', positionGlassPanel);
     window.visualViewport?.addEventListener('resize', positionGlassPanel);
     window.visualViewport?.addEventListener('scroll', positionGlassPanel);
@@ -6370,7 +6368,7 @@ return { panelHTML, EF, TM, ICON, esc };
     panel.querySelectorAll('details.cawf-sound-card').forEach(card => card.addEventListener('toggle', () => card.querySelector('[data-cawf-sound-gear]').setAttribute('aria-expanded', String(card.open))));
   }
 
-  function syncGlassPanel(panel) {
+  function syncGlassPanel_legacy(panel) {
     syncGlassTheme(); syncGlassRanges(panel); syncGlassKeywords(panel, false);
     const s = state.settings, $ = selector => panel.querySelector(selector);
     const put = (selector, text) => { const el = $(selector); if (el && el.textContent !== String(text)) el.textContent = text; };
@@ -6443,7 +6441,7 @@ return { panelHTML, EF, TM, ICON, esc };
       panel.id = IDS.panel;
       panel.setAttribute('role', 'dialog');
       panel.setAttribute('aria-label', '날씨/환경 이펙트 설정');
-      panel.innerHTML = glassUI.panelHTML();
+      panel.innerHTML = macPanelHTML();
       setupGlassPanel(panel);
       setupRoomAudioPanel(panel);
 
@@ -6458,7 +6456,7 @@ return { panelHTML, EF, TM, ICON, esc };
     state.panel = panel;
     getPanelKeywordDrafts(panel);
     if (!panel.dataset.cawfKeywordEffect) selectPanelKeywordEffect('rain', { stash: false });
-    if (!panel.dataset.cawfPage) setPanelTab('fx');
+    if (!panel.dataset.cawfPage) setPanelTab(getSavedPanelPage());
     syncPanel();
   }
 
@@ -6897,7 +6895,7 @@ return { panelHTML, EF, TM, ICON, esc };
     state.button?.setAttribute('data-panel-open', 'true');
     state.button?.setAttribute('aria-expanded', 'true');
     bumpFloatingButtonActivity();
-    setPanelTab('fx');
+    setPanelTab(state.panel?.dataset.cawfPage || getSavedPanelPage());
     positionGlassPanel();
     state.panel.dataset.anim = 'in';
     clearTimeout(state.panel.__glassEnterTimer);
@@ -6940,9 +6938,14 @@ return { panelHTML, EF, TM, ICON, esc };
     let paintedTimeEffect = (state.settings.enabled && state.settings.timeBackgroundEnabled && timeEffect && timeEffect !== 'none')
       ? timeEffect
       : 'none';
+    // v2.9.1: 이야기에서 시간을 못 찾았을 때, 낮 느낌 효과면 원래 낮 하늘을 깐다.
+    if (paintedTimeEffect === 'none' && state.settings.enabled && state.settings.timeBackgroundEnabled
+      && state.settings.timeBackground !== 'none' && state.settings.sceneEnabled !== false
+      && (!timeEffect || timeEffect === 'none') && DAY_SKY_FOR[screenEffect]) {
+      paintedTimeEffect = DAY_SKY_FOR[screenEffect];
+    }
     if (screenEffect === 'underwater') paintedTimeEffect = 'none';
     root.setAttribute('data-time-effect', paintedTimeEffect);
-    syncSceneLayer(screenEffect);
     if (state.timeLayer instanceof HTMLElement) {
       state.timeLayer.setAttribute('data-time-effect', paintedTimeEffect);
       state.timeLayer.setAttribute('data-cawf-time-enabled', paintedTimeEffect !== 'none' ? 'true' : 'false');
@@ -13134,399 +13137,7 @@ ${timeText}`);
   }
 
 
-  /* ============================================================
-   * v2.9.0 장면 꾸미기 레이어
-   * 효과에 어울리는 하늘·구름·나뭇가지·빛을 입자 뒤에 깐다.
-   * - 하늘은 시간대 배경이 꺼져 있거나 감지되지 않았을 때만 칠한다(시간대 하늘을 덮지 않음).
-   * - 나뭇가지는 코너에 두고 SVG를 data URI 배경으로 써서 DOM을 가볍게 유지한다.
-   * ============================================================ */
-  const SCENE_ID = 'cawf-scene';
-  const SCENE_BRANCH_FOR = Object.freeze({
-    sakura: 'sakura', butterflies: 'spring', greenLeaves: 'green', leaves: 'maple', snow: 'snowy', fireflies: 'canopy', feathers: '', sunlight: 'green'
-  });
-  const SCENE_EFFECTS = new Set(['sakura', 'butterflies', 'greenLeaves', 'leaves', 'snow', 'rain', 'fog', 'fireflies', 'fireworks', 'feathers', 'sunlight', 'candlelight', 'spellcast', 'mana', 'shore', 'sandstorm', 'bokeh']);
-  const sceneBranchCache = {};
-  const SCENE_SUN = new Set(['sakura', 'butterflies', 'greenLeaves', 'sunlight', 'shore', 'leaves']);
-  const SCENE_RAYS = new Set(['feathers', 'sunlight']);
-  const SCENE_CLOUDS = new Set(['sakura', 'butterflies', 'greenLeaves', 'leaves', 'snow', 'rain', 'fog', 'sunlight', 'shore', 'sandstorm']);
-
-  function sceneRng(seed) {
-    let a = seed >>> 0;
-    return () => {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  const SCENE_PALETTES = Object.freeze({
-    sakura: { bark: '#4b3431', barkHi: '#6e4c45', density: .78, deco: 'blossom' },
-    spring: { bark: '#5b4632', barkHi: '#7a5f44', density: .85, deco: 'leafflower' },
-    green: { bark: '#4f3c2b', barkHi: '#6c5440', density: 1, deco: 'leaf' },
-    maple: { bark: '#3f2a22', barkHi: '#5e4034', density: .95, deco: 'maple' },
-    snowy: { bark: '#3a3332', barkHi: '#55494a', density: .3, deco: 'snow' },
-    canopy: { bark: '#0b1511', barkHi: '#12201a', density: 1, deco: 'dark' }
-  });
-
-  function buildBranchSvg(kind, seed) {
-    const pal = SCENE_PALETTES[kind];
-    if (!pal) return '';
-    const rnd = sceneRng(seed);
-    const R = (a, b) => a + (b - a) * rnd();
-    const pick = arr => arr[Math.floor(rnd() * arr.length)];
-    const segs = [];
-    const spots = [];
-    const f = n => Math.round(n * 10) / 10;
-
-    function grow(x, y, ang, len, w, depth) {
-      const steps = 4;
-      let cx = x, cy = y, a = ang;
-      let side = rnd() < .5 ? -1 : 1;
-      for (let i = 0; i < steps; i++) {
-        a += R(-.2, .2) + .035; // 끝으로 갈수록 살짝 처진다
-        a = Math.max(-.35, Math.min(1.25, a));
-        const l = len / steps * R(.8, 1.2);
-        const nx = cx + Math.cos(a) * l;
-        const ny = cy + Math.sin(a) * l;
-        const ww = Math.max(.8, w * (1 - i / steps * .55));
-        // 살짝 휜 선
-        const mx = (cx + nx) / 2 + Math.sin(a) * R(-6, 6);
-        const my = (cy + ny) / 2 - Math.cos(a) * R(-6, 6);
-        segs.push({ d: `M${f(cx)} ${f(cy)}Q${f(mx)} ${f(my)} ${f(nx)} ${f(ny)}`, w: ww, x: nx, y: ny, a });
-        if (depth <= 2 || i >= 2) spots.push({ x: nx, y: ny, a, depth, w: ww });
-        if (depth > 0 && i < steps - 1 && rnd() < .78) {
-          side = -side;
-          const na = Math.max(-.45, Math.min(1.35, a + side * R(.45, .9)));
-          grow(nx, ny, na, len * R(.4, .58), ww * .62, depth - 1);
-        }
-        cx = nx; cy = ny;
-      }
-      spots.push({ x: cx, y: cy, a, depth, w: 1, tip: true });
-    }
-
-    // 왼쪽 위 모서리에서 화면 안쪽으로 뻗는 큰 가지 두 개
-    grow(-30, R(40, 70), R(.12, .32), R(380, 450), 15, 3);
-    grow(-30, R(-10, 10), R(.42, .62), R(220, 270), 9, 2);
-    if (kind === 'canopy') grow(R(80, 160), -30, R(1.2, 1.5), R(140, 190), 7, 2);
-
-    let defs = '';
-    let deco = '';
-    const use = (id, x, y, s, r, extra = '') => `<use href="#${id}" transform="translate(${f(x)} ${f(y)}) rotate(${Math.round(r)}) scale(${Math.round(s * 100) / 100})"${extra}/>`;
-
-    if (pal.deco === 'blossom') {
-      const petal = 'M0 0C-5.2-5.6-5.4-12.4-1.8-15.2L0-13.2 1.8-15.2C5.4-12.4 5.2-5.6 0 0Z';
-      const petals = [0, 72, 144, 216, 288].map(r => `<path d="${petal}" transform="rotate(${r})"/>`).join('');
-      defs += `<radialGradient id="pg" cx="0" cy="0" r="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff8fb4"/><stop offset=".32" stop-color="#ffd2e1"/><stop offset="1" stop-color="#fff3f7"/></radialGradient>`;
-      defs += `<radialGradient id="pg2" cx="0" cy="0" r="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f06292"/><stop offset=".35" stop-color="#f8a5c2"/><stop offset="1" stop-color="#ffd9e6"/></radialGradient>`;
-      defs += `<g id="fl" fill="url(#pg)">${petals}<circle r="2.6" fill="#e2557f"/><g fill="#ffd54f"><circle cx="0" cy="-4.4" r=".9"/><circle cx="4.2" cy="-1.4" r=".9"/><circle cx="2.6" cy="3.6" r=".9"/><circle cx="-2.6" cy="3.6" r=".9"/><circle cx="-4.2" cy="-1.4" r=".9"/></g></g>`;
-      defs += `<g id="fl2" fill="url(#pg2)">${petals}<circle r="2.4" fill="#c2185b"/></g>`;
-      defs += `<g id="bud"><ellipse rx="3.2" ry="4.6" fill="#ec6f99"/><path d="M0 4.6l-2 4h4z" fill="#7b5a3a"/></g>`;
-      for (const s of spots) {
-        const n = Math.round((s.tip ? 7 : s.depth >= 3 ? 4 : 5) * pal.density);
-        for (let i = 0; i < n; i++) {
-          const rr = R(4, s.tip ? 26 : 20);
-          const t = R(0, Math.PI * 2);
-          const x = s.x + Math.cos(t) * rr, y = s.y + Math.sin(t) * rr * .8;
-          const r = rnd();
-          deco += r < .14 ? use('bud', x, y, R(.7, 1.1), R(-40, 40)) : use(r < .5 ? 'fl2' : 'fl', x, y, R(.62, 1.12), R(0, 72), r > .82 ? ' opacity=".82"' : '');
-        }
-      }
-    } else if (pal.deco === 'leaf' || pal.deco === 'leafflower' || pal.deco === 'dark') {
-      const greens = pal.deco === 'dark' ? ['#0f2a21', '#133325', '#0a1f18', '#183b2b'] : pal.deco === 'leafflower' ? ['#8fca6a', '#a9d97f', '#6db357', '#c3e39a'] : ['#4f9a48', '#6cb85a', '#3d7f3c', '#86c76a', '#2f6b34'];
-      defs += `<path id="lf" d="M0 0C5-4 6-13 0-20C-6-13-5-4 0 0Z"/>`;
-      defs += `<path id="lv" d="M0 0V-18" stroke="rgba(255,255,255,.28)" stroke-width=".8" fill="none"/>`;
-      if (pal.deco === 'leafflower') {
-        const p = 'M0 0C-3-3-3-7 0-8.5C3-7 3-3 0 0Z';
-        defs += `<g id="wf" fill="#fffaf0">${[0, 72, 144, 216, 288].map(r => `<path d="${p}" transform="rotate(${r})"/>`).join('')}<circle r="1.8" fill="#ffc94a"/></g>`;
-      }
-      for (const s of spots) {
-        const n = Math.round((s.tip ? 8 : s.depth >= 3 ? 3 : 5) * pal.density);
-        for (let i = 0; i < n; i++) {
-          const rr = R(3, s.tip ? 24 : 18);
-          const t = R(0, Math.PI * 2);
-          const x = s.x + Math.cos(t) * rr, y = s.y + Math.sin(t) * rr * .8;
-          const rot = t * 180 / Math.PI + 90 + R(-30, 30);
-          const sc = R(.7, 1.25) * (pal.deco === 'dark' ? 1.3 : 1);
-          deco += `<g fill="${pick(greens)}">${use('lf', x, y, sc, rot)}</g>`;
-          if (pal.deco !== 'dark' && rnd() < .5) deco += use('lv', x, y, sc, rot);
-          if (pal.deco === 'leafflower' && rnd() < .2) deco += use('wf', x + R(-6, 6), y + R(-6, 6), R(.7, 1.1), R(0, 72));
-        }
-      }
-    } else if (pal.deco === 'maple') {
-      // 다섯 갈래 단풍잎
-      const pts = [];
-      const lobes = [11.5, 10, 6.8, 6.8, 10];
-      for (let i = 0; i < 5; i++) {
-        const ang = -Math.PI / 2 + i * Math.PI * 2 / 5;
-        const o = lobes[i];
-        const pt = (aa, rr) => pts.push(`${f(Math.cos(aa) * rr)} ${f(Math.sin(aa) * rr)}`);
-        pt(ang - .2, o * .62);
-        pt(ang - .07, o * .8);
-        pt(ang, o);
-        pt(ang + .07, o * .8);
-        pt(ang + .2, o * .62);
-        pt(ang + Math.PI / 5, 3.6);
-      }
-      defs += `<g id="mp"><path d="M${pts.join('L')}Z"/><path d="M0 0V7" stroke="#6b3a1f" stroke-width=".9"/></g>`;
-      const warm = ['#d9472b', '#ef7d2a', '#f2b33d', '#b8321f', '#e85d2a', '#c9a03a'];
-      for (const s of spots) {
-        const n = Math.round((s.tip ? 7 : s.depth >= 3 ? 2 : 4) * pal.density);
-        for (let i = 0; i < n; i++) {
-          const rr = R(3, s.tip ? 24 : 18);
-          const t = R(0, Math.PI * 2);
-          deco += `<g fill="${pick(warm)}">${use('mp', s.x + Math.cos(t) * rr, s.y + Math.sin(t) * rr * .8, R(.75, 1.25), R(-50, 50))}</g>`;
-        }
-      }
-    }
-
-    // 가지(굵은 것부터), 그리고 위쪽 하이라이트
-    const bark = segs.map(s => `<path d="${s.d}" stroke-width="${f(s.w)}"/>`).join('');
-    const hi = segs.filter(s => s.w > 3).map(s => `<path d="${s.d}" stroke-width="${f(s.w * .32)}" transform="translate(0 ${f(-s.w * .22)})"/>`).join('');
-    let snow = '';
-    if (pal.deco === 'snow') {
-      snow = `<g stroke="#f7fbff" stroke-linecap="round" fill="none" opacity=".95">${segs.map(s => `<path d="${s.d}" stroke-width="${f(Math.max(1.4, s.w * .62))}" transform="translate(0 ${f(-s.w * .5)})"/>`).join('')}</g>`;
-      snow += `<g fill="#ffffff">${spots.filter(() => rnd() < .5).map(s => `<circle cx="${f(s.x + R(-4, 4))}" cy="${f(s.y - s.w * .7)}" r="${f(R(1.6, 3.6))}"/>`).join('')}</g>`;
-      snow += `<g fill="#d63a3a">${spots.filter(s => s.tip && rnd() < .45).map(s => `<circle cx="${f(s.x)}" cy="${f(s.y + 3)}" r="2.4"/><circle cx="${f(s.x + 4)}" cy="${f(s.y + 5)}" r="2.1"/>`).join('')}</g>`;
-    }
-
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><defs>${defs}</defs>`
-      + `<g fill="none" stroke="${pal.bark}" stroke-linecap="round">${bark}</g>`
-      + `<g fill="none" stroke="${pal.barkHi}" stroke-linecap="round" opacity=".7">${hi}</g>`
-      + snow + deco + `</svg>`;
-    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
-  }
-
-  function getSceneBranch(kind, side) {
-    const key = `${kind}:${side}`;
-    if (!sceneBranchCache[key]) sceneBranchCache[key] = buildBranchSvg(kind, side === 'l' ? 1729 + kind.length * 31 : 4057 + kind.length * 17);
-    return sceneBranchCache[key];
-  }
-
-  function getSceneHtml() {
-    return `<div class="cawf-sc-sky"></div><div class="cawf-sc-sun"></div><div class="cawf-sc-rays"></div><div class="cawf-sc-cloud c1"></div><div class="cawf-sc-cloud c2"></div><div class="cawf-sc-cloud c3"></div><div class="cawf-sc-haze"></div><div class="cawf-sc-branch l"></div><div class="cawf-sc-branch r"></div><div class="cawf-sc-tint"></div>`;
-  }
-
-  function ensureSceneLayer(root = state.root) {
-    if (!(root instanceof HTMLElement)) return null;
-    let scene = root.querySelector(`#${SCENE_ID}`);
-    if (!(scene instanceof HTMLElement)) {
-      scene = document.createElement('div');
-      scene.id = SCENE_ID;
-      scene.setAttribute('aria-hidden', 'true');
-      scene.dataset.scene = 'none';
-      scene.innerHTML = getSceneHtml();
-      const timeLayer = root.querySelector(`#${IDS.timeLayer}`);
-      if (timeLayer) timeLayer.after(scene); else root.prepend(scene);
-    }
-    return scene;
-  }
-
-  function syncSceneLayer(screenEffect = getPaintedScreenEffect()) {
-    const root = state.root;
-    if (!(root instanceof HTMLElement)) return;
-    const scene = ensureSceneLayer(root);
-    if (!scene) return;
-    const s = state.settings;
-    const next = (s.enabled && s.sceneEnabled !== false && SCENE_EFFECTS.has(screenEffect)) ? screenEffect : 'none';
-    if (scene.dataset.scene === next) return;
-    const apply = () => {
-      scene.dataset.scene = next;
-      const kind = SCENE_BRANCH_FOR[next] || '';
-      scene.dataset.branch = kind || 'none';
-      scene.dataset.sun = String(SCENE_SUN.has(next));
-      scene.dataset.rays = String(SCENE_RAYS.has(next));
-      scene.dataset.clouds = String(SCENE_CLOUDS.has(next));
-      if (kind) {
-        scene.style.setProperty('--cawf-branch-l', getSceneBranch(kind, 'l'));
-        scene.style.setProperty('--cawf-branch-r', getSceneBranch(kind, 'r'));
-      }
-      scene.classList.remove('cawf-sc-out');
-    };
-    clearTimeout(scene.__cawfSwap);
-    if (scene.dataset.scene === 'none' || next === 'none') {
-      apply();
-      return;
-    }
-    // 장면끼리 바뀔 때는 잠깐 어둡게 내렸다가 새 장면을 올린다.
-    scene.classList.add('cawf-sc-out');
-    scene.__cawfSwap = setTimeout(apply, 520);
-  }
-
-  const SCENE_CSS = `
-      #${SCENE_ID} {
-        position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-        opacity: min(1, calc(var(--cawf-effect-opacity, .74) * 1.18));
-        transition: opacity .52s ease;
-        display: block;
-      }
-      #${SCENE_ID}.cawf-sc-out { opacity: 0 !important; }
-      #${SCENE_ID}[data-scene="none"] { display: none; }
-      #${SCENE_ID} > div { position: absolute; pointer-events: none; }
-      #${SCENE_ID} .cawf-sc-sky, #${SCENE_ID} .cawf-sc-haze, #${SCENE_ID} .cawf-sc-tint, #${SCENE_ID} .cawf-sc-rays { inset: 0; }
-      #${SCENE_ID} .cawf-sc-sky, #${SCENE_ID} .cawf-sc-sun, #${SCENE_ID} .cawf-sc-rays, #${SCENE_ID} .cawf-sc-cloud, #${SCENE_ID} .cawf-sc-haze { display: none; }
-
-      /* 하늘: 시간대 배경이 없을 때만 칠한다. 위에서 아래로 사라져 채팅 글씨 쪽은 비운다. */
-      #${IDS.root}[data-time-effect="none"] #${SCENE_ID} .cawf-sc-sky {
-        display: block;
-        opacity: .86;
-        background: var(--sc-sky, none);
-        -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 30%, rgba(0,0,0,.7) 44%, rgba(0,0,0,.25) 56%, transparent 66%);
-        mask-image: linear-gradient(180deg, #000 0%, #000 30%, rgba(0,0,0,.7) 44%, rgba(0,0,0,.25) 56%, transparent 66%);
-      }
-      #${IDS.root}[data-time-effect="none"] #${SCENE_ID} .cawf-sc-haze {
-        display: block;
-        background: var(--sc-haze, none);
-        -webkit-mask-image: linear-gradient(180deg, transparent 18%, #000 40%, #000 52%, transparent 70%);
-        mask-image: linear-gradient(180deg, transparent 18%, #000 40%, #000 52%, transparent 70%);
-      }
-      #${IDS.root}[data-time-effect="none"] #${SCENE_ID}[data-sun="true"] .cawf-sc-sun {
-        display: block; top: -16vmin; right: 6vw; width: 46vmin; height: 46vmin; border-radius: 50%;
-        background: radial-gradient(circle, var(--sc-sun, rgba(255,250,225,.95)) 0 9%, rgba(255,244,200,.55) 16%, rgba(255,240,190,.18) 38%, rgba(255,240,190,0) 68%);
-        animation: cawf-sc-pulse 9s ease-in-out infinite;
-      }
-      #${SCENE_ID}[data-rays="true"] .cawf-sc-rays {
-        display: block;
-        background: repeating-conic-gradient(from 168deg at 72% -12%, rgba(255,248,220,0) 0deg 4deg, var(--sc-ray, rgba(255,248,220,.16)) 5deg 7deg, rgba(255,248,220,0) 8deg 13deg);
-        -webkit-mask-image: radial-gradient(120% 90% at 72% -12%, #000 0%, rgba(0,0,0,.5) 40%, transparent 70%);
-        mask-image: radial-gradient(120% 90% at 72% -12%, #000 0%, rgba(0,0,0,.5) 40%, transparent 70%);
-        animation: cawf-sc-rays 14s ease-in-out infinite;
-      }
-      #${SCENE_ID}[data-clouds="true"] .cawf-sc-cloud {
-        width: 62vw; height: 22vh; left: -10vw;
-        background:
-          radial-gradient(closest-side at 30% 62%, var(--sc-cloud, rgba(255,255,255,.85)), transparent),
-          radial-gradient(closest-side at 52% 44%, var(--sc-cloud, rgba(255,255,255,.85)), transparent),
-          radial-gradient(closest-side at 72% 64%, var(--sc-cloud, rgba(255,255,255,.85)), transparent);
-        background-size: 60% 80%, 55% 100%, 50% 75%;
-        background-repeat: no-repeat;
-        background-position: 0 100%, 40% 0, 100% 100%;
-        filter: blur(6px);
-        opacity: var(--sc-cloud-o, .7);
-        animation: cawf-sc-drift calc(120s / var(--cawf-effect-speed, 1)) linear infinite;
-      }
-      #${SCENE_ID} .cawf-sc-cloud.c1 { top: 4vh; }
-      #${SCENE_ID} .cawf-sc-cloud.c2 { top: 14vh; width: 44vw; height: 15vh; animation-duration: calc(170s / var(--cawf-effect-speed, 1)); animation-delay: -70s; opacity: calc(var(--sc-cloud-o, .7) * .75); }
-      #${SCENE_ID} .cawf-sc-cloud.c3 { top: -2vh; width: 52vw; height: 18vh; animation-duration: calc(210s / var(--cawf-effect-speed, 1)); animation-delay: -150s; opacity: calc(var(--sc-cloud-o, .7) * .6); }
-      #${IDS.root}[data-time-effect="none"] #${SCENE_ID}[data-clouds="true"] .cawf-sc-cloud,
-      #${SCENE_ID}[data-clouds="true"][data-scene="rain"] .cawf-sc-cloud,
-      #${SCENE_ID}[data-clouds="true"][data-scene="fog"] .cawf-sc-cloud { display: block; }
-
-      /* 나뭇가지 */
-      #${SCENE_ID} .cawf-sc-branch {
-        display: none; top: -3vh; width: min(52vw, 620px); aspect-ratio: 3 / 2;
-        background-size: contain; background-repeat: no-repeat;
-        filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
-        will-change: transform;
-      }
-      #${SCENE_ID} .cawf-sc-branch.l { left: -2vw; background-image: var(--cawf-branch-l); transform-origin: 0 10%; animation: cawf-sc-sway-l 9s ease-in-out infinite; }
-      #${SCENE_ID} .cawf-sc-branch.r { right: -2vw; background-image: var(--cawf-branch-r); transform-origin: 50% 0; transform: scaleX(-1); width: min(40vw, 480px); animation: cawf-sc-sway-r 11s ease-in-out infinite; animation-delay: -3s; }
-      #${SCENE_ID}:not([data-branch="none"]) .cawf-sc-branch { display: block; }
-      @media (max-width: 720px) {
-        #${SCENE_ID} .cawf-sc-branch.l { width: 74vw; top: -4vh; }
-        #${SCENE_ID} .cawf-sc-branch.r { width: 50vw; top: -6vh; opacity: .85; }
-      }
-      /* 밤·초저녁엔 가지를 어둡게, 벚꽃은 밤벚꽃처럼 은은히 빛나게 */
-      #${IDS.root}[data-time-effect="night"] #${SCENE_ID} .cawf-sc-branch,
-      #${IDS.root}[data-time-effect="twilight"] #${SCENE_ID} .cawf-sc-branch { filter: brightness(.62) saturate(.85) drop-shadow(0 0 10px rgba(0,0,0,.3)); }
-      #${IDS.root}[data-time-effect="night"] #${SCENE_ID}[data-branch="sakura"] .cawf-sc-branch,
-      #${IDS.root}[data-time-effect="twilight"] #${SCENE_ID}[data-branch="sakura"] .cawf-sc-branch { filter: brightness(.8) saturate(1.1) drop-shadow(0 0 14px rgba(255,150,190,.45)); }
-      #${IDS.root}[data-time-effect="sunset"] #${SCENE_ID} .cawf-sc-branch,
-      #${IDS.root}[data-time-effect="dawn"] #${SCENE_ID} .cawf-sc-branch { filter: sepia(.25) saturate(1.15) brightness(.9) drop-shadow(0 4px 12px rgba(120,40,20,.25)); }
-
-      /* 덧칠(비네트 등): 시간대와 상관없이 */
-      #${SCENE_ID} .cawf-sc-tint { background: var(--sc-tint, none); }
-
-      @keyframes cawf-sc-sway-l { 0%,100% { transform: rotate(-.8deg); } 50% { transform: rotate(1.4deg) translateY(.3vh); } }
-      @keyframes cawf-sc-sway-r { 0%,100% { transform: scaleX(-1) rotate(-.6deg); } 50% { transform: scaleX(-1) rotate(1.2deg) translateY(.4vh); } }
-      @keyframes cawf-sc-drift { from { transform: translateX(-30vw); } to { transform: translateX(130vw); } }
-      @keyframes cawf-sc-pulse { 0%,100% { opacity: .9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
-      @keyframes cawf-sc-rays { 0%,100% { opacity: .65; } 50% { opacity: 1; } }
-
-      #${IDS.root}[data-cawf-low-power="true"] #${SCENE_ID} *,
-      #${IDS.root}[data-cawf-low-power="true"] #${SCENE_ID} { animation: none !important; will-change: auto !important; }
-      #${IDS.root}[data-cawf-low-power="true"] #${SCENE_ID} .cawf-sc-cloud { transform: translateX(20vw); }
-      @media (prefers-reduced-motion: reduce) { #${SCENE_ID} * { animation: none !important; } }
-
-      /* ── 장면별 색 ── */
-      #${SCENE_ID}[data-scene="sakura"] {
-        --sc-sky: linear-gradient(180deg, #4f97e3 0%, #7fb8ef 24%, #b4d7f5 44%, #e3edf8 58%, #f9dce8 72%, #fbe6ee 100%);
-        --sc-haze: radial-gradient(90% 60% at 50% 48%, rgba(255,196,218,.55), rgba(255,196,218,0) 70%);
-        --sc-cloud: rgba(255,255,255,.92); --sc-cloud-o: .62;
-        --sc-tint: radial-gradient(120% 70% at 50% 110%, rgba(255,182,206,.14), transparent 60%);
-      }
-      #${SCENE_ID}[data-scene="butterflies"] {
-        --sc-sky: linear-gradient(180deg, #5aa2e6 0%, #8cc4ef 28%, #c6e3f2 48%, #eaf5df 64%, #f4f9e6 100%);
-        --sc-haze: radial-gradient(90% 60% at 50% 50%, rgba(214,240,170,.45), transparent 70%);
-        --sc-cloud: rgba(255,255,255,.92); --sc-cloud-o: .6;
-      }
-      #${SCENE_ID}[data-scene="greenLeaves"] {
-        --sc-sky: linear-gradient(180deg, #3f8ddc 0%, #6fb0ea 26%, #a9d5ef 46%, #d7eedf 62%, #e7f4dc 100%);
-        --sc-haze: radial-gradient(90% 60% at 50% 50%, rgba(170,220,150,.38), transparent 70%);
-        --sc-cloud: rgba(255,255,255,.95); --sc-cloud-o: .7;
-        --sc-tint: radial-gradient(100% 80% at 0% 0%, rgba(40,90,40,.12), transparent 50%), radial-gradient(100% 80% at 100% 0%, rgba(40,90,40,.1), transparent 50%);
-      }
-      #${SCENE_ID}[data-scene="leaves"] {
-        --sc-sky: linear-gradient(180deg, #5b8fcf 0%, #94b6d9 24%, #d6cdb6 44%, #f0c995 60%, #f2b77c 76%, #f6d3a8 100%);
-        --sc-haze: radial-gradient(90% 60% at 50% 50%, rgba(250,170,90,.35), transparent 70%);
-        --sc-cloud: rgba(255,240,222,.85); --sc-cloud-o: .55;
-        --sc-tint: radial-gradient(120% 80% at 50% 120%, rgba(160,70,20,.14), transparent 60%);
-      }
-      #${SCENE_ID}[data-scene="snow"] {
-        --sc-sky: linear-gradient(180deg, #56627a 0%, #75819a 26%, #9ba6b8 48%, #bcc4d0 66%, #ccd3dc 100%);
-        --sc-cloud: rgba(236,240,246,.9); --sc-cloud-o: .75;
-        --sc-tint: radial-gradient(60% 50% at 0% 0%, rgba(235,245,255,.5), transparent 70%), radial-gradient(60% 50% at 100% 0%, rgba(235,245,255,.42), transparent 70%), radial-gradient(40% 30% at 0% 100%, rgba(225,238,255,.14), transparent 70%), radial-gradient(40% 30% at 100% 100%, rgba(225,238,255,.14), transparent 70%);
-      }
-      #${SCENE_ID}[data-scene="rain"] {
-        --sc-sky: linear-gradient(180deg, #252e3d 0%, #384356 30%, #566275 52%, #6f7a8b 70%, #7f8999 100%);
-        --sc-cloud: rgba(70,78,94,.95); --sc-cloud-o: .9;
-        --sc-tint: radial-gradient(130% 90% at 50% 50%, transparent 55%, rgba(10,16,28,.28) 100%);
-      }
-      #${SCENE_ID}[data-scene="fog"] {
-        --sc-sky: linear-gradient(180deg, #8f98a3 0%, #aab2bb 34%, #c4cad0 60%, #d2d6da 100%);
-        --sc-cloud: rgba(230,233,236,.9); --sc-cloud-o: .8;
-      }
-      #${SCENE_ID}[data-scene="fireflies"] {
-        --sc-sky: linear-gradient(180deg, #08111f 0%, #0e1d2e 34%, #14303a 60%, #1a3b3a 100%);
-        --sc-haze: radial-gradient(90% 50% at 50% 55%, rgba(190,230,110,.12), transparent 70%);
-        --sc-tint: radial-gradient(130% 90% at 50% 45%, transparent 50%, rgba(2,8,6,.42) 100%);
-      }
-      #${SCENE_ID}[data-scene="fireworks"] {
-        --sc-sky: linear-gradient(180deg, #050818 0%, #0d1434 36%, #231c48 62%, #3a2350 100%);
-        --sc-haze: radial-gradient(90% 50% at 50% 60%, rgba(255,140,120,.14), transparent 70%);
-      }
-      #${SCENE_ID}[data-scene="feathers"] {
-        --sc-sky: linear-gradient(180deg, #5d5a9a 0%, #7e78b4 26%, #a99bc6 48%, #d2b9c4 66%, #e6cdb8 100%);
-        --sc-haze: radial-gradient(70% 60% at 50% 30%, rgba(255,236,190,.35), transparent 70%);
-        --sc-ray: rgba(255,246,214,.22);
-        --sc-tint: radial-gradient(80% 60% at 50% -10%, rgba(255,250,230,.35), transparent 70%);
-      }
-      #${SCENE_ID}[data-scene="sunlight"] {
-        --sc-sky: linear-gradient(180deg, #4d98e2 0%, #84bdee 26%, #c3e0f1 46%, #f2efd8 62%, #fff3d2 100%);
-        --sc-cloud: rgba(255,255,255,.95); --sc-cloud-o: .55;
-        --sc-ray: rgba(255,246,206,.2);
-      }
-      #${SCENE_ID}[data-scene="shore"] {
-        --sc-sky: linear-gradient(180deg, #3d8fdc 0%, #70b6ea 28%, #ade0f2 50%, #d9f3f4 66%, #eefaf8 100%);
-        --sc-cloud: rgba(255,255,255,.95); --sc-cloud-o: .65;
-      }
-      #${SCENE_ID}[data-scene="sandstorm"] {
-        --sc-sky: linear-gradient(180deg, #9c7748 0%, #b98f5a 30%, #d4ad78 54%, #e3c492 72%, #e9cfa3 100%);
-        --sc-cloud: rgba(214,176,120,.9); --sc-cloud-o: .7;
-        --sc-tint: radial-gradient(130% 90% at 50% 50%, transparent 50%, rgba(90,58,20,.3) 100%);
-      }
-      #${SCENE_ID}[data-scene="bokeh"] {
-        --sc-sky: linear-gradient(180deg, #0a0f24 0%, #161c3c 36%, #2c2448 62%, #3a2a4c 100%);
-      }
-      #${SCENE_ID}[data-scene="candlelight"] {
-        --sc-tint: radial-gradient(75% 70% at 50% 55%, rgba(255,170,80,.06), transparent 55%), radial-gradient(130% 100% at 50% 50%, transparent 45%, rgba(24,12,4,.5) 100%);
-      }
-      #${SCENE_ID}[data-scene="spellcast"], #${SCENE_ID}[data-scene="mana"] {
-        --sc-tint: radial-gradient(130% 100% at 50% 50%, transparent 48%, rgba(40,16,80,.42) 100%), radial-gradient(60% 40% at 50% 100%, rgba(140,90,255,.12), transparent 70%);
-      }
-      #${SCENE_ID}[data-scene="spellcast"] { --sc-tint: radial-gradient(130% 100% at 50% 50%, transparent 48%, rgba(60,20,90,.4) 100%), radial-gradient(60% 40% at 50% 100%, rgba(210,120,255,.12), transparent 70%); }
-`;
-
+  const DAY_SKY_FOR = Object.freeze({ sakura: 'morning', butterflies: 'morning', greenLeaves: 'afternoon', sunlight: 'afternoon', leaves: 'afternoon' });
   /* ============================================================
    * v2.9.0 방별 BGM · 방 효과음 (YouTube / 직접 음원)
    * - 곡 목록은 크랙 화면에 넣어 실제로 재생되는지(임베드 허용) 확인한 영상만 담았다.
@@ -14099,48 +13710,50 @@ ${timeText}`);
 
   // ── 패널 ──
   function roomBgmPanelHTML() {
-    const moodChips = Object.entries(BGM_LIBRARY).map(([k, v]) => `<button type="button" class="cawfg-k" data-cawf-room-mood="${k}" aria-pressed="false" title="${v.label}"><span class="i">${v.icon}</span><span class="l">${v.s}</span></button>`).join('');
+    const moodTiles = Object.entries(BGM_LIBRARY).map(([k, v]) => `<button type="button" class="cawm-tile" data-cawf-room-mood="${k}" aria-pressed="false" title="${v.label}"><span class="ti">${v.icon}</span><span class="tl">${v.s}</span></button>`).join('');
     return `
-      <div class="cawfg-sh"><b>방 BGM</b><small>방마다 다르게 틀어요 · 유튜브</small><button type="button" class="cawfg-sw" role="switch" aria-checked="false" data-cawf-toggle="bgmEnabled" aria-label="BGM 사용"><i></i></button></div>
-      <div data-dim="bgmEnabled">
-        <div class="cawf-np" data-cawf-np>
-          <span class="cawf-np-disc" data-cawf-np-icon>♪</span>
-          <span class="cawf-np-t"><b data-cawf-np-title>준비 중</b><small data-cawf-np-sub></small></span>
-          <button type="button" class="cawfg-ib sm" data-cawf-bgm-toggle aria-label="재생/일시정지">⏯</button>
-          <button type="button" class="cawfg-ib sm" data-cawf-bgm-next aria-label="다른 곡">⏭</button>
+        <div class="cawm-group">
+          <div class="cawm-row"><span class="cawm-rl">방 음악<small>채팅방 분위기에 맞는 음악을 유튜브로 틀어요</small></span><button type="button" class="cawm-sw" role="switch" aria-checked="false" data-cawf-toggle="bgmEnabled" aria-label="방 음악 사용"></button></div>
         </div>
-        <div class="cawfg-card">
-          <div class="cawfg-row"><span class="cawfg-rl">적용 범위<small data-cawf-room-source></small></span><div class="cawfg-seg sm" data-cawf-room-scope-seg style="--n:2"><i class="cawfg-seg-ind"></i><button type="button" data-cawf-room-scope="room" aria-pressed="true">이 방</button><button type="button" data-cawf-room-scope="story" aria-pressed="false">이 작품</button></div></div>
-          <div class="cawfg-row"><span class="cawfg-rl">음악</span><div class="cawfg-seg sm" data-cawf-room-bgm-seg style="--n:3"><i class="cawfg-seg-ind"></i><button type="button" data-cawf-room-bgm="auto" aria-pressed="true">분위기 자동</button><button type="button" data-cawf-room-bgm="custom" aria-pressed="false">직접 지정</button><button type="button" data-cawf-room-bgm="off" aria-pressed="false">끄기</button></div></div>
-          <div class="cawf-room-url" data-cawf-room-bgm-url-wrap hidden>
-            <input type="text" spellcheck="false" placeholder="유튜브 영상·재생목록 주소 또는 mp3 주소" data-cawf-room-bgm-url>
-            <button type="button" class="cawfg-btn sm primary" data-cawf-room-bgm-apply>적용</button>
+        <div data-dim="bgmEnabled">
+          <div class="cawm-np" data-cawf-np>
+            <span class="cawm-np-art" data-cawf-np-icon>♪</span>
+            <span class="cawm-np-t"><b data-cawf-np-title>준비 중</b><small data-cawf-np-sub></small></span>
+            <button type="button" class="cawm-ib" data-cawf-bgm-toggle aria-label="재생 / 멈춤"><span class="ic-play">${MAC_ICON.play}</span><span class="ic-pause">${MAC_ICON.pause}</span></button>
+            <button type="button" class="cawm-ib" data-cawf-bgm-next aria-label="다른 곡">${MAC_ICON.next}</button>
           </div>
-          <div class="cawfg-rrow"><span class="cawfg-rl">볼륨</span><span class="cawfg-rwrap"><input type="range" class="cawfg-range" data-cawf-range="bgmVolume" min="0" max="1" step="0.01" aria-label="BGM 볼륨"></span><output class="cawfg-out" data-cawf-output-bgm></output></div>
-          <div class="cawfg-row"><span class="cawfg-rl">이야기 분위기 읽기<small>전투·긴장·슬픔·설렘 같은 장면이면 곡을 바꿔요</small></span><button type="button" class="cawfg-sw sm" role="switch" aria-checked="false" data-cawf-toggle="bgmReadStory" aria-label="이야기 분위기 읽기"><i></i></button></div>
-        </div>
-        <div class="cawf-room-moods" data-cawf-room-mood-wrap>
-          <div class="cawfg-acc-h" style="padding:10px 2px 6px">이 방 분위기 고정 <small style="font-weight:400">· 한 번 더 누르면 자동으로 돌아가요</small></div>
-          <div class="cawfg-kwgrid">${moodChips}</div>
-        </div>
-      </div>`;
+          <h3 class="cawm-h">이 방 설정</h3>
+          <div class="cawm-group">
+            <div class="cawm-row"><span class="cawm-rl">저장할 곳<small data-cawf-room-source></small></span><div class="cawm-seg" data-cawf-room-scope-seg role="group"><button type="button" data-cawf-room-scope="room" aria-pressed="true">이 방만</button><button type="button" data-cawf-room-scope="story" aria-pressed="false">이 작품 전체</button></div></div>
+            <div class="cawm-row"><span class="cawm-rl">음악 고르기</span><div class="cawm-seg" data-cawf-room-bgm-seg role="group"><button type="button" data-cawf-room-bgm="auto" aria-pressed="true">분위기 따라</button><button type="button" data-cawf-room-bgm="custom" aria-pressed="false">주소 넣기</button><button type="button" data-cawf-room-bgm="off" aria-pressed="false">끄기</button></div></div>
+            <div class="cawm-row cawm-urlrow" data-cawf-room-bgm-url-wrap hidden>
+              <input type="text" class="cawm-input" spellcheck="false" placeholder="유튜브 영상·재생목록 주소, 또는 mp3 주소" data-cawf-room-bgm-url>
+              <button type="button" class="cawm-btn primary" data-cawf-room-bgm-apply>적용</button>
+            </div>
+            <div class="cawm-row"><span class="cawm-rl">볼륨</span><span class="cawm-slider"><input type="range" class="cawm-range" data-cawf-range="bgmVolume" min="0" max="1" step="0.01" aria-label="음악 볼륨"><output class="cawm-out" data-cawf-output-bgm></output></span></div>
+            <div class="cawm-row"><span class="cawm-rl">이야기 분위기 읽기<small>전투·긴장·슬픔·설렘 장면이 나오면 곡을 바꿔요</small></span><button type="button" class="cawm-sw" role="switch" aria-checked="false" data-cawf-toggle="bgmReadStory" aria-label="이야기 분위기 읽기"></button></div>
+          </div>
+          <div data-cawf-room-mood-wrap>
+            <h3 class="cawm-h">분위기 고정 <small>누르면 이 방은 그 분위기로만 · 다시 누르면 풀려요</small></h3>
+            <div class="cawm-tiles sm">${moodTiles}</div>
+          </div>
+        </div>`;
   }
 
   function roomSfxPanelHTML() {
-    const ambChips = [['follow', '🔗', '효과 연동'], ['off', '🔇', '끄기'], ...Object.entries(AMBIENCE_LIBRARY).map(([k, v]) => [k, v.icon, v.label]), ['custom', '🌐', '직접']]
-      .map(([k, i, l]) => `<button type="button" class="cawfg-k" data-cawf-room-sfx="${k}" aria-pressed="false"><span class="i">${i}</span><span class="l">${l}</span></button>`).join('');
+    const tiles = [['follow', '🔗', '효과 따라'], ['off', '🔇', '끄기'], ...Object.entries(AMBIENCE_LIBRARY).map(([k, v]) => [k, v.icon, v.label]), ['custom', '🌐', '주소 넣기']]
+      .map(([k, i, l]) => `<button type="button" class="cawm-tile" data-cawf-room-sfx="${k}" aria-pressed="false"><span class="ti">${i}</span><span class="tl">${l}</span></button>`).join('');
     return `
-      <div class="cawfg-acc-h cawf-room-h">🏠 방 효과음 <small>이 방에 계속 깔릴 배경 소리</small></div>
-      <div class="cawfg-card cawf-room-sfx">
-        <div class="cawfg-kwgrid" style="padding:8px 0">${ambChips}</div>
-        <div class="cawf-room-url" data-cawf-room-sfx-url-wrap hidden>
-          <input type="text" spellcheck="false" placeholder="유튜브 또는 mp3 주소" data-cawf-room-sfx-url>
-          <button type="button" class="cawfg-btn sm primary" data-cawf-room-sfx-apply>적용</button>
-        </div>
-        <div class="cawfg-rrow"><span class="cawfg-rl">효과음 볼륨</span><span class="cawfg-rwrap"><input type="range" class="cawfg-range" data-cawf-room-sfx-vol min="0" max="1" step="0.01" aria-label="방 효과음 볼륨"></span><output class="cawfg-out" data-cawf-room-sfx-out></output></div>
-        <p class="cawf-room-note" data-cawf-room-sfx-note></p>
-      </div>
-      <div class="cawfg-acc-h cawf-room-h">🔗 효과 연동 소리 <small>화면 효과를 따라 켜지고 꺼져요</small></div>`;
+          <h3 class="cawm-h">이 방 배경 소리 <small>방에 계속 깔리는 소리</small></h3>
+          <div class="cawm-tiles sm">${tiles}</div>
+          <div class="cawm-group" style="margin-top:10px">
+            <div class="cawm-row cawm-urlrow" data-cawf-room-sfx-url-wrap hidden>
+              <input type="text" class="cawm-input" spellcheck="false" placeholder="유튜브 또는 mp3 주소" data-cawf-room-sfx-url>
+              <button type="button" class="cawm-btn primary" data-cawf-room-sfx-apply>적용</button>
+            </div>
+            <div class="cawm-row"><span class="cawm-rl">볼륨</span><span class="cawm-slider"><input type="range" class="cawm-range" data-cawf-room-sfx-vol min="0" max="1" step="0.01" aria-label="배경 소리 볼륨"><output class="cawm-out" data-cawf-room-sfx-out></output></span></div>
+          </div>
+          <p class="cawm-note" data-cawf-room-sfx-note></p>`;
   }
 
   function setupRoomAudioPanel(panel) {
@@ -14256,7 +13869,7 @@ ${timeText}`);
     panel.querySelectorAll('[data-cawf-room-mood]').forEach(b => b.dataset.detected = String(!cfg.mood && b.dataset.cawfRoomMood === r.currentMood));
     setPressed('[data-cawf-room-sfx]', 'cawfRoomSfx', cfg.sfxMode);
     const src = panel.querySelector('[data-cawf-room-source]');
-    if (src) src.textContent = !onRoom ? '채팅방에서만 바꿀 수 있어요' : ({ room: '지금 이 방 설정을 써요', story: '이 작품 설정을 따르는 중', default: '기본 설정을 쓰는 중' }[cfg.source]);
+    if (src) src.textContent = !onRoom ? '채팅방에서만 바꿀 수 있어요' : ({ room: '이 방만의 설정이에요', story: '이 작품 설정을 따라요', default: '아직 기본값이에요' }[cfg.source]);
     const bgmWrap = panel.querySelector('[data-cawf-room-bgm-url-wrap]');
     if (bgmWrap) bgmWrap.hidden = cfg.bgmMode !== 'custom';
     const bgmInput = panel.querySelector('[data-cawf-room-bgm-url]');
@@ -14290,9 +13903,9 @@ ${timeText}`);
     if (np) np.dataset.playing = String(!!bgm?.playing);
     if (icon) icon.textContent = cfg.bgmMode === 'custom' ? '🔗' : (lib?.icon || '♪');
     if (title) {
-      title.textContent = !state.settings.bgmEnabled ? 'BGM 꺼짐'
+      title.textContent = !state.settings.bgmEnabled ? '방 음악 꺼짐'
         : !onRoom ? '채팅방에 들어가면 재생돼요'
-        : cfg.bgmMode === 'off' ? '이 방은 BGM 끔'
+        : cfg.bgmMode === 'off' ? '이 방은 음악 끔'
         : (bgm?.title || (cfg.bgmMode === 'custom' ? (cfg.bgmUrl ? '불러오는 중…' : '주소를 넣어 주세요') : (lib ? lib.label : '준비 중')));
     }
     if (sub) {
@@ -14307,28 +13920,685 @@ ${timeText}`);
     return !!(state.room?.bgm?.playing || state.room?.amb?.playing);
   }
 
-  const ROOM_PANEL_CSS = `
-#cawf-panel .cawfg-sh:has(> .cawfg-sw[aria-checked="false"]) + [data-dim]{opacity:.45;filter:saturate(.6);transition:opacity .3s}
-#cawf-panel .cawf-np{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 10px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 18%,transparent),color-mix(in srgb,var(--accent-2) 14%,transparent));box-shadow:var(--lg-sm)}
-#cawf-panel .cawf-np-disc{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font-size:16px;background:radial-gradient(circle at 50% 50%,var(--fill-3) 0 18%,transparent 19%),conic-gradient(from 0deg,rgba(255,255,255,.08),rgba(255,255,255,.22),rgba(255,255,255,.08),rgba(255,255,255,.22),rgba(255,255,255,.08));box-shadow:inset 0 0 0 1px var(--line)}
-#cawf-panel .cawf-np[data-playing="true"] .cawf-np-disc{animation:cawf-np-spin 6s linear infinite}
-@keyframes cawf-np-spin{to{transform:rotate(360deg)}}
-#cawf-panel .cawf-np-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-#cawf-panel .cawf-np-t b{font-size:11.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#cawf-panel .cawf-np-t small{font-size:9.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#cawf-panel .cawf-room-url{display:flex;gap:6px;padding:4px 0 8px}
-#cawf-panel .cawf-room-url[hidden]{display:none}
-#cawf-panel .cawf-room-url input{flex:1;min-width:0;height:28px;border:0;border-radius:9px;padding:0 9px;background:var(--fill);box-shadow:var(--well);font-size:10.5px;outline:none;color:var(--ink)}
-#cawf-panel .cawf-room-url input:focus{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 70%,transparent)}
-#cawf-panel .cawf-room-url input::placeholder{color:var(--ink-3)}
-#cawf-panel .cawf-room-moods[hidden]{display:none}
-#cawf-panel .cawf-room-h{padding:14px 2px 2px}
-#cawf-panel .cawf-room-h small{font-weight:400}
-#cawf-panel .cawf-room-sfx{padding-top:4px}
-#cawf-panel .cawf-room-sfx .cawfg-kwgrid{padding:6px 0 8px}
-#cawf-panel .cawf-room-note{margin:0;padding:0 0 9px;font-size:9.5px;color:var(--ink-3);line-height:1.45}
-#cawf-panel [data-cawf-room-mood][data-detected="true"]{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 70%,transparent);color:var(--ink)}
-#cawf-panel [data-cawf-room-mood][data-detected="true"]::after{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+  const ROOM_PANEL_CSS = '';
+
+  /* ============================================================
+   * v2.9.1 설정 창: macOS 시스템 설정 스타일
+   * 왼쪽 사이드바(메뉴) + 오른쪽 묶음 목록. 기존 data-cawf-* 연결은 그대로 쓴다.
+   * ============================================================ */
+  const MAC_PAGES = Object.freeze([
+    { id: 'now', label: '한눈에', color: '#0A84FF', icon: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="2" width="5" height="5" rx="1.4"/><rect x="9" y="2" width="5" height="5" rx="1.4"/><rect x="2" y="9" width="5" height="5" rx="1.4"/><rect x="9" y="9" width="5" height="5" rx="1.4"/></svg>' },
+    { id: 'fx', label: '화면 효과', color: '#AF52DE', icon: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 1.5l1.2 3.6 3.6 1.2-3.6 1.2-1.2 3.6-1.2-3.6L1.7 6.3l3.6-1.2z"/><path d="M12 8.6l.75 1.9 1.9.75-1.9.75L12 13.9l-.75-1.9-1.9-.75 1.9-.75z"/></svg>' },
+    { id: 'time', label: '시간대', color: '#FF9500', icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 4.8V8l2.3 1.5"/></svg>' },
+    { id: 'bgm', label: '음악', color: '#FF2D55', icon: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 3.3l7-1.8v8.9a2 2 0 1 1-1.4-1.9V4.7L7.4 5.8v6.6A2 2 0 1 1 6 10.5z"/></svg>' },
+    { id: 'snd', label: '효과음', color: '#34C759', icon: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 6h2.4L8 3v10L4.4 10H2z"/><path d="M10.4 5.4a3.6 3.6 0 0 1 0 5.2M12.4 3.6a6.2 6.2 0 0 1 0 8.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' },
+    { id: 'kw', label: '키워드', color: '#5856D6', icon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2.2 2.5h5.2l6.1 6.1-4.9 4.9-6.4-6.4z"/><circle cx="5.3" cy="5.6" r="1.1" fill="currentColor" stroke="none"/></svg>' }
+  ]);
+  const MAC_PAGE_IDS = MAC_PAGES.map(p => p.id);
+  const MAC_ICON = Object.freeze({
+    refresh: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.5-3.6"/><path d="M13 2.8v2.8h-2.8"/></svg>',
+    play: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.2v9.6L12.6 8z"/></svg>',
+    pause: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="3.2" width="2.8" height="9.6" rx=".8"/><rect x="9.2" y="3.2" width="2.8" height="9.6" rx=".8"/></svg>',
+    next: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 3.4v9.2L9.4 8z"/><rect x="10.4" y="3.4" width="2.4" height="9.2" rx=".7"/></svg>',
+    more: '<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="3.6" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="12.4" cy="8" r="1.4"/></svg>',
+    reset: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 0 1.5-3.6"/><path d="M3 2.8v2.8h2.8"/></svg>'
+  });
+
+  const MAC_MIXER = Object.freeze([
+    { key: 'audioVolume', icon: '🌧️', name: '빗소리', fx: '비', url: 'audio-url', st: 'audio-url-status', apply: 'apply-audio-url', clear: 'clear-audio-url', ph: 'https://.../rain.mp3' },
+    { key: 'cricketAudioVolume', icon: '🦗', name: '풀벌레', fx: '반딧불', url: 'cricket-audio-url', st: 'cricket-audio-url-status', apply: 'apply-cricket-audio-url', clear: 'clear-cricket-audio-url', ph: 'https://.../crickets.mp3' },
+    { key: 'waveAudioVolume', icon: '🌊', name: '파도', fx: '파도', url: 'wave-audio-url', st: 'wave-audio-url-status', apply: 'apply-wave-audio-url', clear: 'clear-wave-audio-url', ph: 'https://.../waves.mp3' },
+    { key: 'fireworksAudioVolume', icon: '🎆', name: '불꽃놀이', fx: '불꽃놀이', url: 'fireworks-audio-url', st: 'fireworks-audio-url-status', apply: 'apply-fireworks-audio-url', clear: 'clear-fireworks-audio-url', ph: 'https://.../fireworks.mp3' },
+    { key: 'underwaterAudioVolume', icon: '🫧', name: '수중음', fx: '수중', url: 'underwater-audio-url', st: 'underwater-audio-url-status', apply: 'apply-underwater-audio-url', clear: 'clear-underwater-audio-url', ph: 'https://.../underwater.mp3' },
+    { key: 'spellAudioVolume', icon: '🌀', name: '마법 폭발', fx: '마법진', info: true }
+  ]);
+  const MAC_MIXER_STATE = Object.freeze({
+    audioVolume: ['audioUnlocked', 'rainNodes', 'audioError'],
+    cricketAudioVolume: ['cricketAudioUnlocked', 'cricketNodes', 'cricketAudioError'],
+    waveAudioVolume: ['waveAudioUnlocked', 'waveNodes', 'waveAudioError'],
+    spellAudioVolume: ['spellAudioUnlocked', 'spellAudioPlaying', 'spellAudioError'],
+    fireworksAudioVolume: ['fireworksAudioUnlocked', 'fireworksNodes', 'fireworksAudioError'],
+    underwaterAudioVolume: ['underwaterAudioUnlocked', 'underwaterNodes', 'underwaterAudioError']
+  });
+
+  const macSw = (key, label) => `<button type="button" class="cawm-sw" role="switch" aria-checked="false" data-cawf-toggle="${key}" aria-label="${label}"></button>`;
+  const macSeg = (key, opts, cls = '') => `<div class="cawm-seg ${cls}" data-seg="${key}" role="group">${opts.map(([v, l]) => `<button type="button" data-cawf-chip="${key}" data-value="${v}" aria-pressed="false">${l}</button>`).join('')}</div>`;
+  const macRow = (label, sub, control, attrs = '') => `<div class="cawm-row"${attrs}><span class="cawm-rl">${label}${sub ? `<small>${sub}</small>` : ''}</span>${control}</div>`;
+  const macRange = (key, label, min, max, step, sub = '') => macRow(label, sub, `<span class="cawm-slider"><input type="range" class="cawm-range" data-cawf-range="${key}" min="${min}" max="${max}" step="${step}" aria-label="${label}"><output class="cawm-out" data-cawf-output="${key}"></output></span>`);
+
+  function macTile(attr, value, icon, label, extra = '') {
+    return `<button type="button" class="cawm-tile" ${attr}="${value}" aria-pressed="false"${extra}><span class="ti">${icon}</span><span class="tl">${label}</span></button>`;
+  }
+
+  function macPanelHTML() {
+    const { EF, TM, EFFECTS, CLUSTERS, TIMES } = glassUI;
+    const tabs = MAC_PAGES.map(p => `<button type="button" class="cawm-tab" role="tab" data-cawf-tab="${p.id}" aria-selected="false"><span class="cawm-tab-ic" style="--c:${p.color}">${p.icon}</span><span class="cawm-tab-l">${p.label}</span><span class="cawm-tab-dot"></span></button>`).join('');
+
+    const fxTiles = CLUSTERS.map(c => `<div class="cawm-cap">${c.label}</div>` + c.ids.map(id => {
+      const e = EF[id];
+      return macTile('data-cawf-chip="effect" data-value', id, e.icon, e.label, ` title="${e.label}${e.snd ? ` · ${e.snd} 소리 함께` : ''}${e.when ? ` · ${e.when}` : ''}"`);
+    }).join('')).join('');
+    const timeTiles = TIMES.map(t => `<button type="button" class="cawm-tile sky" data-cawf-chip="timeBackground" data-value="${t.id}" aria-pressed="false" style="--sky:${t.sky}" title="${t.label} ${t.range}"><span class="ti">${t.icon}</span><span class="tl">${t.label}</span></button>`).join('');
+    const kwTiles = SCREEN_EFFECT_PRIORITY.map(id => `<button type="button" class="cawm-tile" data-cawf-keyword-chip data-value="${id}" aria-pressed="false"><span class="ti">${EF[id]?.icon || '•'}</span><span class="tl">${EF[id]?.label || EFFECT_LABELS[id]}</span><span class="tn" data-kw-n="${id}"></span></button>`).join('');
+
+    const mixer = MAC_MIXER.map(m => {
+      const more = m.info
+        ? `<p class="cawm-note">내장 효과음 · “magic spell” by KoiRoylers · Pixabay Content License · <a href="${PIXABAY_SPELL_SOURCE_PAGE}" target="_blank" rel="noopener noreferrer">출처</a></p>`
+        : `<p class="cawm-note" data-cawf-${m.st}></p><div class="cawm-inline"><input type="text" class="cawm-input" spellcheck="false" placeholder="${m.ph}" data-cawf-${m.url}><button type="button" class="cawm-btn primary" data-cawf-${m.apply}>적용</button><button type="button" class="cawm-btn" data-cawf-${m.clear}>기본으로</button></div>`;
+      return `<div class="cawm-mx" data-mx="${m.key}">
+        <div class="cawm-row"><span class="cawm-mx-n"><span class="mi">${m.icon}</span><span>${m.name}<small data-mx-state>${m.fx} 효과일 때</small></span></span>
+          <span class="cawm-slider"><input type="range" class="cawm-range" min="0" max="1" step="0.01" data-cawf-range="${m.key}" aria-label="${m.name} 볼륨"><output class="cawm-out" data-cawf-output="${m.key}"></output></span>
+          <button type="button" class="cawm-ib" data-cawm-gear aria-expanded="false" aria-label="${m.name} ${m.info ? '출처' : '음원 주소'}">${MAC_ICON.more}</button></div>
+        <div class="cawm-mx-more" hidden>${more}</div>
+      </div>`;
+    }).join('');
+
+    return `
+<div class="cawm-win">
+  <aside class="cawm-side" data-cawm-drag>
+    <div class="cawm-lights">
+      <button type="button" class="cawm-light" data-c="red" data-cawf-close aria-label="닫기"></button>
+      <button type="button" class="cawm-light" data-c="yellow" data-cawf-close aria-label="접기"></button>
+      <button type="button" class="cawm-light" data-c="green" data-cawm-zoom aria-label="크게 보기"></button>
+    </div>
+    <nav class="cawm-tabs" role="tablist" aria-label="설정 메뉴">${tabs}</nav>
+    <div class="cawm-side-foot">
+      <button type="button" class="cawm-tab cawm-reset" data-cawm-reset><span class="cawm-tab-ic">${MAC_ICON.reset}</span><span class="cawm-tab-l" data-reset-lbl>초기값으로</span></button>
+      <div class="cawm-ver">v${VERSION}</div>
+    </div>
+  </aside>
+
+  <main class="cawm-main">
+    <header class="cawm-toolbar" data-cawm-drag>
+      <h2 data-cawm-title>한눈에</h2>
+      <div class="cawm-tb-right">
+        <div class="cawm-kwacts" data-foot="kw">
+          <button type="button" class="cawm-btn" data-kw-discard>되돌리기</button>
+          <button type="button" class="cawm-btn primary" data-cawf-save-keywords>저장<span class="cnt" data-kw-dirty-n>0</span></button>
+        </div>
+        <div class="cawm-master"><span>사용</span>${macSw('enabled', '전체 사용')}</div>
+      </div>
+    </header>
+
+    <div class="cawm-scroll">
+      <section class="cawm-page" data-cawf-page="now" role="tabpanel">
+        <div class="cawm-stats">
+          <div class="cawm-stat" data-nt="fx" data-go="fx"><span class="si" data-nt-ico>☁️</span><span class="st"><small>화면 효과</small><b data-nt-val></b><em data-nt-sub></em></span></div>
+          <div class="cawm-stat" data-nt="time" data-go="time"><span class="si" data-nt-ico>◷</span><span class="st"><small>시간대</small><b data-nt-val></b><em data-nt-sub></em></span></div>
+          <div class="cawm-stat" data-nt="bgm" data-go="bgm"><span class="si" data-nt-ico>♪</span><span class="st"><small>음악</small><b data-nt-val></b><em data-nt-sub></em></span></div>
+          <div class="cawm-stat" data-nt="snd" data-go="snd"><span class="si"><span class="cawm-eq" data-nt-eq><i></i><i></i><i></i></span></span><span class="st"><small>효과음</small><b data-nt-val></b><em data-nt-sub></em></span></div>
+        </div>
+        <button type="button" class="cawm-btn wide" data-cawf-rescan>${MAC_ICON.refresh}<span>최신 답장 다시 읽기</span></button>
+
+        <h3 class="cawm-h">자동으로 바꾸기</h3>
+        <div class="cawm-group">
+          ${macRow('답장 읽고 효과 고르기', 'AI 답장에 나온 낱말을 보고 효과를 바꿔요', macSw('autoDetect', '자동 감지'))}
+          ${macRow('절전', '느린 기기에서는 움직임을 줄여요', macSeg('powerSaver', [['auto', '자동'], ['on', '켬'], ['off', '끔']]))}
+        </div>
+        <p class="cawm-note">화면 효과 · 시간대 · 음악 · 효과음은 왼쪽 메뉴에서 하나씩 바꿀 수 있어요.</p>
+      </section>
+
+      <section class="cawm-page" data-cawf-page="fx" role="tabpanel" hidden>
+        <div class="cawm-group">
+          ${macRow('화면 효과', '', macSw('screenEffectEnabled', '화면 효과 사용'))}
+        </div>
+        <div data-dim="screenEffectEnabled">
+          <h3 class="cawm-h">효과 고르기 <small data-auto-sub></small></h3>
+          <div class="cawm-tiles">
+            ${macTile('data-cawf-chip="effect" data-value', 'auto', '🪄', '자동')}
+            ${macTile('data-cawf-chip="effect" data-value', 'none', '🚫', '끄기')}
+            ${fxTiles}
+          </div>
+          <div class="cawm-detail"><span data-d-ico></span><span><b data-d-name></b><small data-d-info></small></span><span class="cawm-pill" data-d-pill></span></div>
+
+          <h3 class="cawm-h">모양</h3>
+          <div class="cawm-group">
+            <div class="cawm-row"><span class="cawm-rl" data-cawf-intensity-label>효과 양</span>${macSeg('intensity', [['low', '적게'], ['medium', '보통'], ['high', '많이']])}</div>
+            ${macRange('effectOpacity', '진하기', .12, 1.5, .01)}
+            ${macRange('effectSpeed', '속도', .2, 1.75, .01)}
+          </div>
+          <div class="cawm-group" data-cawf-galaxy-options hidden>
+            ${macRow('유성', '5~11초마다 지나가요', macSw('galaxyMeteors', '은하수 유성'))}
+            ${macRow('마우스 따라 움직이기', '마우스를 움직이면 별이 깊이 있게 따라와요', macSw('galaxyParallax', '은하수 마우스 시차'))}
+          </div>
+        </div>
+      </section>
+
+      <section class="cawm-page" data-cawf-page="time" role="tabpanel" hidden>
+        <div class="cawm-group">
+          ${macRow('시간대 배경', '이야기 속 시각에 맞춰 하늘색을 바꿔요', macSw('timeBackgroundEnabled', '시간대 배경 사용'))}
+          ${macRow('시간을 모를 땐 낮 하늘', '벚꽃·나비·나뭇잎·햇빛 효과면 낮 하늘을 깔아요', macSw('sceneEnabled', '시간을 모를 땐 낮 하늘'))}
+          ${macRow('밤하늘 별똥별', '밤 배경일 때만 떨어져요', macSw('nightMeteors', '밤하늘 별똥별'))}
+        </div>
+        <div data-dim="timeBackgroundEnabled">
+          <h3 class="cawm-h">시간대 고르기 <small data-tauto-sub></small></h3>
+          <div class="cawm-tiles">
+            ${macTile('data-cawf-chip="timeBackground" data-value', 'auto', '🪄', '자동')}
+            ${macTile('data-cawf-chip="timeBackground" data-value', 'none', '🚫', '끄기')}
+            ${timeTiles}
+          </div>
+          <h3 class="cawm-h">모양</h3>
+          <div class="cawm-group">
+            ${macRange('timeOpacity', '진하기', .12, 2, .01, '100%보다 올리면 더 짙어져요')}
+            ${macRange('timeSpeed', '속도', .55, 1.75, .01)}
+          </div>
+        </div>
+      </section>
+
+      <section class="cawm-page" data-cawf-page="bgm" role="tabpanel" hidden>
+        ${roomBgmPanelHTML()}
+      </section>
+
+      <section class="cawm-page" data-cawf-page="snd" role="tabpanel" hidden>
+        <div class="cawm-group">
+          ${macRow('효과음', '', macSw('soundEnabled', '효과음 사용'))}
+          ${macRow('효과 따라 켜고 끄기', '맞는 화면 효과일 때만 소리를 내요', macSw('audioFollowEffect', '효과와 연동'))}
+          ${macRow('다른 탭 볼 때도 재생', '', macSw('audioWhileHidden', '탭 숨김 중 재생'))}
+        </div>
+        <div data-dim="soundEnabled">
+          <div class="cawm-banner" data-lock>
+            <span class="bi" data-lock-ico></span>
+            <span class="bt"><b data-lock-title></b><small data-lock-sub></small></span>
+            <button type="button" class="cawm-btn primary" data-cawf-unlock-audio>소리 허용</button>
+          </div>
+          ${roomSfxPanelHTML()}
+          <h3 class="cawm-h">효과 따라 나는 소리 <small>볼륨 · 음원 바꾸기는 ⋯</small></h3>
+          <div class="cawm-group cawm-mixer">${mixer}</div>
+        </div>
+      </section>
+
+      <section class="cawm-page" data-cawf-page="kw" role="tabpanel" hidden>
+        <p class="cawm-note top">AI 답장에 이 낱말이 나오면 그 효과로 바뀌어요. 위에 있는 효과일수록 먼저 골라져요.</p>
+        <div class="cawm-tiles kw">${kwTiles}</div>
+        <div class="cawm-group cawm-editor">
+          <div class="cawm-ed-head"><span class="ei" data-ed-ico></span><b data-cawf-keyword-caption></b><small data-ed-count></small><span class="sp"></span>
+            <div class="cawm-seg" data-seg="kwMode" role="group"><button type="button" data-seg-v="tags" aria-pressed="true">태그</button><button type="button" data-seg-v="raw" aria-pressed="false">글로</button></div>
+            <button type="button" class="cawm-link" data-kw-default>기본값</button>
+          </div>
+          <div class="cawm-tags" data-kw-tags></div>
+          <textarea class="cawm-textarea" data-cawf-keyword-editor spellcheck="false" hidden placeholder="쉼표나 줄바꿈으로 나눠요"></textarea>
+        </div>
+        <h3 class="cawm-h">문장으로 시험해 보기</h3>
+        <div class="cawm-group">
+          <div class="cawm-row"><input type="text" class="cawm-input wide" data-kw-test placeholder="예: 창밖으로 빗소리가 들렸다 | 21:30" spellcheck="false"></div>
+          <div class="cawm-row result"><span class="cawm-test-out" data-kw-test-out></span></div>
+        </div>
+        <h3 class="cawm-h">읽는 방식</h3>
+        <div class="cawm-group">
+          ${macRow('낱말이 없을 때', '', macSeg('keywordFallback', [['off', '효과 끄기'], ['keep', '그대로 두기']]))}
+          ${macRow('코드블록도 읽기', '상태창 같은 코드블록 글도 함께 봐요', macSw('includeCodeBlocksInDetection', '코드블록도 읽기'))}
+        </div>
+      </section>
+    </div>
+  </main>
+</div>`;
+  }
+
+  function setPanelTab(page) {
+    const panel = state.panel;
+    if (!panel) return;
+    const normalized = MAC_PAGE_IDS.includes(page) ? page : 'now';
+    if (panel.dataset.cawfPage === 'kw' && normalized !== 'kw') stashActiveKeywordDraft(panel);
+    panel.dataset.cawfPage = normalized;
+    const scroll = panel.querySelector('.cawm-scroll');
+    if (scroll) scroll.scrollTop = 0;
+    const title = panel.querySelector('[data-cawm-title]');
+    if (title) title.textContent = MAC_PAGES.find(p => p.id === normalized)?.label || '';
+    const kwActs = panel.querySelector('[data-foot="kw"]');
+    if (kwActs) kwActs.dataset.on = String(normalized === 'kw');
+    panel.querySelectorAll('[data-cawf-tab]').forEach(button => {
+      const active = button.getAttribute('data-cawf-tab') === normalized;
+      button.setAttribute('data-on', String(active));
+      button.setAttribute('aria-selected', String(active));
+      button.tabIndex = active ? 0 : -1;
+    });
+    panel.querySelectorAll('[data-cawf-page]').forEach(pageEl => {
+      const active = pageEl.getAttribute('data-cawf-page') === normalized;
+      pageEl.setAttribute('data-on', String(active));
+      pageEl.hidden = !active;
+    });
+    try { sessionStorage.setItem('cawf_panel_page', normalized); } catch (_) {}
+  }
+
+  function getSavedPanelPage() {
+    try { return sessionStorage.getItem('cawf_panel_page') || 'now'; } catch (_) { return 'now'; }
+  }
+
+  function positionGlassPanel() {
+    const panel = state.panel, button = state.button;
+    if (!panel || panel.getAttribute('data-open') !== 'true') return;
+    const vp = window.visualViewport;
+    const vw = vp?.width || innerWidth, vh = vp?.height || innerHeight;
+    const vx = vp?.offsetLeft || 0, vy = vp?.offsetTop || 0;
+    const zoom = panel.dataset.zoom === 'true';
+    const W = Math.round(Math.min(zoom ? 920 : 720, vw - 16));
+    const H = Math.round(Math.min(zoom ? 720 : 540, vh - 16));
+    let left, top;
+    if (panel.__cawmPos) {
+      left = panel.__cawmPos.left; top = panel.__cawmPos.top;
+    } else if (button) {
+      const b = button.getBoundingClientRect();
+      left = b.right - W;
+      if (b.top - vy - 12 >= H) top = b.top - 12 - H;
+      else if (vy + vh - b.bottom - 12 >= H) top = b.bottom + 12;
+      else top = vy + (vh - H) / 2;
+      if (top < b.bottom && top + H > b.top) {
+        if (b.left - vx >= W + 12) left = b.left - W - 10;
+        else if (vx + vw - b.right >= W + 12) left = b.right + 10;
+      }
+    } else {
+      left = vx + (vw - W) / 2; top = vy + (vh - H) / 2;
+    }
+    left = Math.max(vx + 8, Math.min(vx + vw - W - 8, left));
+    top = Math.max(vy + 8, Math.min(vy + vh - H - 8, top));
+    Object.assign(panel.style, { left: `${Math.round(left)}px`, top: `${Math.round(top)}px`, right: 'auto', bottom: 'auto', width: `${W}px`, height: `${H}px`, maxHeight: 'none' });
+  }
+
+  function setupGlassPanel(panel) {
+    panel.classList.add('cawm');
+    window.addEventListener('resize', positionGlassPanel);
+    window.visualViewport?.addEventListener('resize', positionGlassPanel);
+    panel.querySelectorAll('[data-cawf-intensity-label]').forEach(label => {
+      label.closest('.cawm-row')?.querySelectorAll('[data-value]').forEach(b => b.setAttribute('data-cawf-intensity-option', ''));
+    });
+    panel.querySelectorAll('[data-cawf-tab]').forEach(button => {
+      const page = panel.querySelector(`[data-cawf-page="${button.dataset.cawfTab}"]`);
+      if (!page) return;
+      button.id = `cawm-tab-${button.dataset.cawfTab}`; page.id = `cawm-page-${button.dataset.cawfTab}`;
+      button.setAttribute('aria-controls', page.id); page.setAttribute('aria-labelledby', button.id);
+    });
+
+    const updateTags = tags => {
+      const editor = panel.querySelector('[data-cawf-keyword-editor]');
+      editor.value = parseKeywordText(tags.join(', ')).join(', ');
+      stashActiveKeywordDraft(panel); syncGlassKeywords(panel);
+    };
+
+    let resetTimer = 0;
+    panel.addEventListener('click', event => {
+      const t = event.target instanceof Element ? event.target : null;
+      if (!t) return;
+      const go = t.closest('[data-go]');
+      if (go) { setPanelTab(go.dataset.go); syncPanel(); return; }
+      const mode = t.closest('[data-seg="kwMode"] button');
+      if (mode) { stashActiveKeywordDraft(panel); panel.dataset.glassKeywordMode = mode.dataset.segV; syncGlassKeywords(panel); return; }
+      const remove = t.closest('[data-glass-tag-remove]');
+      if (remove) { const tags = parseKeywordText(glassKeywordText(panel, panel.dataset.cawfKeywordEffect)); tags.splice(Number(remove.dataset.glassTagRemove), 1); updateTags(tags); return; }
+      if (t.closest('[data-kw-default]')) {
+        const editor = panel.querySelector('[data-cawf-keyword-editor]');
+        editor.value = DEFAULT_KEYWORDS[panel.dataset.cawfKeywordEffect] || '';
+        stashActiveKeywordDraft(panel); syncGlassKeywords(panel);
+        return;
+      }
+      if (t.closest('[data-kw-discard]')) { clearPanelKeywordDrafts(); selectPanelKeywordEffect(panel.dataset.cawfKeywordEffect || 'rain', { stash: false }); return; }
+      const gear = t.closest('[data-cawm-gear]');
+      if (gear) {
+        const more = gear.closest('.cawm-mx')?.querySelector('.cawm-mx-more');
+        if (more) { more.hidden = !more.hidden; gear.setAttribute('aria-expanded', String(!more.hidden)); }
+        return;
+      }
+      if (t.closest('[data-cawm-zoom]')) {
+        panel.dataset.zoom = String(panel.dataset.zoom !== 'true');
+        positionGlassPanel();
+        return;
+      }
+      const reset = t.closest('[data-cawm-reset]');
+      if (reset) {
+        const label = reset.querySelector('[data-reset-lbl]');
+        if (reset.dataset.armed === 'true') {
+          clearTimeout(resetTimer);
+          reset.dataset.armed = 'false';
+          if (label) label.textContent = '초기값으로';
+          resetSettings();
+        } else {
+          reset.dataset.armed = 'true';
+          if (label) label.textContent = '한 번 더 누르면 초기화';
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => { reset.dataset.armed = 'false'; if (label) label.textContent = '초기값으로'; }, 3000);
+        }
+      }
+    });
+
+    panel.addEventListener('keydown', event => {
+      const input = event.target;
+      if (event.key === 'Escape') { closePanel(); state.button?.focus(); return; }
+      if (input.matches?.('[data-cawf-tab]') && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        const tabs = [...panel.querySelectorAll('.cawm-tabs [data-cawf-tab]')];
+        const i = tabs.indexOf(input);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (i + (event.key === 'ArrowDown' ? 1 : -1) + tabs.length) % tabs.length;
+        setPanelTab(tabs[next].dataset.cawfTab); syncPanel(); tabs[next].focus();
+        return;
+      }
+      if (!input.matches?.('[data-glass-tag-input]') || event.isComposing) return;
+      if (event.key === 'Enter' || event.key === ',') {
+        event.preventDefault();
+        const value = input.value.trim(); if (!value) return;
+        updateTags([...parseKeywordText(glassKeywordText(panel, panel.dataset.cawfKeywordEffect)), value]);
+        panel.querySelector('[data-glass-tag-input]')?.focus();
+      } else if (event.key === 'Backspace' && !input.value) {
+        const tags = parseKeywordText(glassKeywordText(panel, panel.dataset.cawfKeywordEffect)); tags.pop(); updateTags(tags);
+        panel.querySelector('[data-glass-tag-input]')?.focus();
+      }
+    });
+    panel.addEventListener('input', event => { if (event.target.matches?.('[data-kw-test]')) syncGlassKeywordTest(panel); });
+
+    // 창 옮기기: 사이드바·제목줄의 빈 곳을 끌면 움직인다.
+    panel.addEventListener('pointerdown', event => {
+      const t = event.target instanceof Element ? event.target : null;
+      if (!t || event.button !== 0) return;
+      if (!t.closest('[data-cawm-drag]') || t.closest('button, input, textarea, a, select, [role="switch"]')) return;
+      const rect = panel.getBoundingClientRect();
+      const sx = event.clientX, sy = event.clientY;
+      let moved = false;
+      const move = e => {
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (!moved && Math.hypot(dx, dy) < 4) return;
+        moved = true;
+        panel.dataset.dragging = 'true';
+        const vw = innerWidth, vh = innerHeight;
+        const left = Math.max(8 - rect.width + 120, Math.min(vw - 120, rect.left + dx));
+        const top = Math.max(8, Math.min(vh - 60, rect.top + dy));
+        panel.__cawmPos = { left, top };
+        panel.style.left = `${left}px`; panel.style.top = `${top}px`;
+      };
+      const up = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', up);
+        panel.dataset.dragging = 'false';
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', up);
+    });
+  }
+
+  function syncGlassPanel(panel) {
+    if (!panel?.classList.contains('cawm')) return;
+    syncGlassTheme(); syncGlassRanges(panel); syncGlassKeywords(panel, false);
+    const s = state.settings, $ = sel => panel.querySelector(sel);
+    const put = (sel, text) => { const el = $(sel); if (el && el.textContent !== String(text)) el.textContent = text; };
+    const EF = glassUI.EF, TM = glassUI.TM;
+    const effect = getPaintedScreenEffect();
+    const time = s.enabled && s.timeBackgroundEnabled && effect !== 'underwater' ? state.activeTimeEffect : 'none';
+    const sound = getActiveSoundLabel().replace(/^소리:\s*/, '');
+    const soundPlaying = sound !== '없음';
+    panel.dataset.enabled = String(!!s.enabled);
+
+    const r = state.room;
+    const bgm = r?.bgm;
+    const lib = BGM_LIBRARY[r?.currentMood];
+    const bgmOn = !!(s.enabled && s.bgmEnabled);
+    const stats = {
+      fx: [EF[effect]?.icon || '☁️', effect === 'none' ? '없음' : (EFFECT_LABELS[effect] || '없음'), !s.screenEffectEnabled ? '꺼 둠' : s.effect === 'auto' ? (s.autoDetect ? '답장 보고 자동' : '자동 감지 꺼짐') : '직접 고름'],
+      time: [TM[time]?.icon || '◷', time === 'none' ? '없음' : (EFFECT_LABELS[time] || '없음'), !s.timeBackgroundEnabled ? '꺼 둠' : s.timeBackground === 'auto' ? '답장 보고 자동' : '직접 고름'],
+      bgm: [lib?.icon || '♪', !bgmOn ? '꺼 둠' : (bgm?.title || lib?.label || '대기 중'), !bgmOn ? '' : bgm?.playing ? `재생 중${r?.currentWhy ? ' · ' + r.currentWhy : ''}` : bgm?.blocked ? '화면을 한 번 누르면 재생돼요' : (isEpisodePath() ? '불러오는 중' : '채팅방에서 재생돼요')],
+      snd: ['', soundPlaying ? sound : (s.soundEnabled ? '조용함' : '꺼 둠'), soundPlaying ? '재생 중' : '']
+    };
+    Object.entries(stats).forEach(([id, [ico, val, sub]]) => {
+      if (ico) put(`[data-nt="${id}"] [data-nt-ico]`, ico);
+      put(`[data-nt="${id}"] [data-nt-val]`, val);
+      put(`[data-nt="${id}"] [data-nt-sub]`, sub);
+      const el = $(`[data-nt="${id}"]`); if (el) el.title = `${val}${sub ? ' · ' + sub : ''}`;
+    });
+    const eq = $('[data-nt-eq]'); if (eq) eq.dataset.on = String(soundPlaying);
+    const sndTab = $('[data-cawf-tab="snd"]'); if (sndTab) sndTab.dataset.playing = String(soundPlaying);
+    const bgmTab = $('[data-cawf-tab="bgm"]'); if (bgmTab) bgmTab.dataset.playing = String(!!bgm?.playing);
+
+    put('[data-auto-sub]', s.effect === 'auto' ? `지금 감지: ${EFFECT_LABELS[state.lastDetectedEffect] || '없음'}` : '');
+    put('[data-tauto-sub]', s.timeBackground === 'auto' ? `지금 감지: ${EFFECT_LABELS[state.lastDetectedTimeEffect] || '없음'}` : '');
+    put('[data-d-ico]', EF[state.activeEffect]?.icon || '☁️');
+    put('[data-d-name]', EFFECT_LABELS[state.activeEffect] || '효과 없음');
+    put('[data-d-info]', EF[state.activeEffect]?.when || EF[state.activeEffect]?.note || (s.effect === 'auto' ? '답장의 낱말에 맞춰 바뀌어요.' : '고른 효과를 계속 보여 줘요.'));
+    put('[data-d-pill]', effect === 'none' ? '쉬는 중' : '보이는 중');
+    const pill = $('[data-d-pill]'); if (pill) pill.dataset.on = String(effect !== 'none');
+
+    panel.querySelectorAll('[data-cawf-chip="effect"], [data-cawf-chip="timeBackground"]').forEach(button => {
+      const key = button.dataset.cawfChip, active = key === 'effect' ? state.lastDetectedEffect : state.lastDetectedTimeEffect;
+      button.dataset.detected = String(s[key] === 'auto' && !!active && active !== 'none' && button.dataset.value === active);
+    });
+    panel.querySelectorAll('[data-dim]').forEach(el => { el.dataset.dimmed = String(!s[el.dataset.dim]); });
+
+    // 소리 허용 안내
+    const errors = Object.values(MAC_MIXER_STATE).map(c => state[c[2]]).filter(Boolean);
+    const unlocked = Object.values(MAC_MIXER_STATE).every(c => state[c[0]]);
+    const lock = $('[data-lock]');
+    if (lock) {
+      lock.hidden = !!(s.soundEnabled && unlocked && !errors.length);
+      put('[data-lock-title]', !s.soundEnabled ? '효과음이 꺼져 있어요' : errors.length ? '소리를 확인해 주세요' : '브라우저가 소리를 막고 있어요');
+      put('[data-lock-sub]', !s.soundEnabled ? '위 스위치를 켜면 재생돼요' : errors[0] || '‘소리 허용’을 한 번 눌러 주세요');
+      lock.title = getAudioStatusText();
+      put('[data-lock-ico]', errors.length ? '⚠️' : '🔇');
+    }
+    MAC_MIXER.forEach(m => {
+      const row = $(`[data-mx="${m.key}"]`); if (!row) return;
+      const [allowed, nodes, error] = MAC_MIXER_STATE[m.key];
+      const playing = !!s.soundEnabled && !!state[allowed] && !!state[nodes];
+      row.dataset.state = playing ? 'play' : state[error] ? 'error' : 'wait';
+      const st = row.querySelector('[data-mx-state]');
+      const text = state[error] ? state[error] : playing ? '재생 중' : `${m.fx} 효과일 때`;
+      if (st && st.textContent !== text) st.textContent = text;
+    });
+    panel.querySelectorAll('[data-cawf-tab]').forEach(button => { button.tabIndex = button.getAttribute('aria-selected') === 'true' ? 0 : -1; });
+    syncRoomAudioPanel();
+  }
+
+  const MAC_CSS = `
+html #cawf-panel.cawm{all:initial;position:fixed;z-index:2147482601;display:none;box-sizing:border-box;
+  font-family:Pretendard,"Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+  font-size:13px;line-height:1.4;letter-spacing:-.005em;color:var(--m-text);-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere;
+  --m-bg:#1E1E1E;--m-side:#2A2A2C;--m-group:#262628;--m-elev:#2C2C2E;--m-elev2:#3A3A3C;--m-hair:rgba(255,255,255,.07);--m-border:rgba(255,255,255,.09);--m-field:rgba(255,255,255,.14);
+  --m-text:#F2F2F2;--m-text2:#A1A1A6;--m-text3:#8E8E93;--m-accent:#0A84FF;--m-accent-text:#4DA3FF;--m-accent-soft:rgba(10,132,255,.18);--m-ring:rgba(10,132,255,.45);
+  --m-sel:rgba(255,255,255,.1);--m-hover:rgba(255,255,255,.06);--m-off:#39393D;--m-seg-on:#636366;--m-ok:#30D158;--m-warn:#FF9F0A;--m-danger:#FF6961;
+  --m-shadow:0 24px 64px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.14);color-scheme:dark;container-type:inline-size;container-name:cawmwin}
+html #cawf-panel.cawm[data-theme="light"]{--m-bg:#FFFFFF;--m-side:#EDEDEF;--m-group:#F5F5F7;--m-elev:#FFFFFF;--m-elev2:#E8E8ED;--m-hair:rgba(0,0,0,.08);--m-border:rgba(0,0,0,.1);--m-field:rgba(0,0,0,.18);
+  --m-text:#1D1D1F;--m-text2:#6E6E73;--m-text3:#86868B;--m-accent:#007AFF;--m-accent-text:#0066CC;--m-accent-soft:rgba(0,122,255,.12);--m-ring:rgba(0,122,255,.35);
+  --m-sel:rgba(0,0,0,.08);--m-hover:rgba(0,0,0,.04);--m-off:#E3E3E8;--m-seg-on:#FFFFFF;--m-ok:#34C759;--m-warn:#C93400;--m-danger:#D70015;
+  --m-shadow:0 24px 64px rgba(0,0,0,.22),0 0 0 .5px rgba(0,0,0,.14);color-scheme:light}
+html #cawf-panel.cawm[data-open="true"]{display:block;animation:cawm-in .18s ease-out}
+@keyframes cawm-in{from{opacity:0;transform:translateY(6px) scale(.985)}}
+#cawf-panel.cawm *,#cawf-panel.cawm *::before,#cawf-panel.cawm *::after{box-sizing:border-box}
+#cawf-panel.cawm button,#cawf-panel.cawm input,#cawf-panel.cawm textarea{font:inherit;color:inherit;letter-spacing:inherit}
+#cawf-panel.cawm button{cursor:pointer}
+#cawf-panel.cawm [hidden]{display:none!important}
+#cawf-panel.cawm :focus-visible{outline:none;box-shadow:0 0 0 3px var(--m-ring)}
+#cawf-panel.cawm[data-dragging="true"]{user-select:none}
+
+#cawf-panel.cawm .cawm-win{position:relative;width:100%;height:100%;display:grid;grid-template-columns:196px minmax(0,1fr);background:var(--m-bg);border-radius:12px;box-shadow:var(--m-shadow);overflow:hidden}
+
+/* 사이드바 */
+#cawf-panel.cawm .cawm-side{display:flex;flex-direction:column;min-height:0;padding:16px 10px 12px;background:var(--m-side);border-right:.5px solid var(--m-border);cursor:grab;user-select:none;touch-action:none}
+#cawf-panel.cawm[data-dragging="true"] .cawm-side,#cawf-panel.cawm[data-dragging="true"] .cawm-toolbar{cursor:grabbing}
+#cawf-panel.cawm .cawm-lights{display:flex;gap:8px;padding:0 8px 20px}
+#cawf-panel.cawm .cawm-light{width:12px;height:12px;border-radius:6px;border:0;padding:0}
+#cawf-panel.cawm .cawm-light:hover{filter:brightness(.9)}
+#cawf-panel.cawm .cawm-light[data-c="red"]{background:#FF5F57}
+#cawf-panel.cawm .cawm-light[data-c="yellow"]{background:#FEBC2E}
+#cawf-panel.cawm .cawm-light[data-c="green"]{background:#28C840}
+#cawf-panel.cawm[data-theme="light"] .cawm-light{box-shadow:inset 0 0 0 .5px rgba(0,0,0,.15)}
+#cawf-panel.cawm .cawm-tabs{display:flex;flex-direction:column;gap:2px}
+#cawf-panel.cawm .cawm-tab{position:relative;width:100%;height:30px;display:flex;align-items:center;gap:9px;padding:0 8px;border:0;border-radius:7px;background:transparent;text-align:left;white-space:nowrap;font-size:13px;color:var(--m-text)}
+#cawf-panel.cawm .cawm-tab:hover{background:var(--m-hover)}
+#cawf-panel.cawm .cawm-tab[aria-selected="true"]{background:var(--m-sel);font-weight:600}
+#cawf-panel.cawm .cawm-tab-ic{flex:none;display:grid;place-items:center;width:18px;height:18px;color:var(--m-accent)}
+#cawf-panel.cawm .cawm-tab-ic svg{width:16px;height:16px;display:block}
+#cawf-panel.cawm .cawm-tab-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-tab-dot{width:6px;height:6px;border-radius:3px;background:var(--m-ok);opacity:0;transition:opacity .2s}
+#cawf-panel.cawm .cawm-tab[data-playing="true"] .cawm-tab-dot{opacity:1}
+#cawf-panel.cawm .cawm-tab[data-dirty="true"] .cawm-tab-dot{opacity:1;background:var(--m-warn)}
+#cawf-panel.cawm .cawm-side-foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+#cawf-panel.cawm .cawm-reset[data-armed="true"]{color:var(--m-danger);font-weight:600}
+#cawf-panel.cawm .cawm-reset[data-armed="true"] .cawm-tab-ic{color:var(--m-danger)!important}
+#cawf-panel.cawm .cawm-ver{padding:0 10px;font-size:11px;color:var(--m-text3)}
+
+/* 본문 */
+#cawf-panel.cawm .cawm-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+#cawf-panel.cawm .cawm-toolbar{flex:0 0 52px;display:flex;align-items:center;gap:12px;padding:0 16px 0 20px;border-bottom:.5px solid var(--m-border);cursor:grab;user-select:none;touch-action:none}
+#cawf-panel.cawm .cawm-toolbar h2{all:unset;flex:1;min-width:0;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--m-text)}
+#cawf-panel.cawm .cawm-tb-right{display:flex;align-items:center;gap:12px}
+#cawf-panel.cawm .cawm-kwacts{display:none;gap:6px}
+#cawf-panel.cawm .cawm-kwacts[data-on="true"]{display:flex}
+#cawf-panel.cawm .cawm-master{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--m-text2)}
+#cawf-panel.cawm .cawm-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:18px 20px 22px}
+#cawf-panel.cawm .cawm-scroll::-webkit-scrollbar{width:8px}
+#cawf-panel.cawm .cawm-scroll::-webkit-scrollbar-thumb{background:var(--m-field);border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+#cawf-panel.cawm[data-enabled="false"] .cawm-scroll{opacity:.5}
+#cawf-panel.cawm [data-dimmed="true"]{opacity:.5;transition:opacity .2s}
+
+#cawf-panel.cawm .cawm-h{all:unset;display:flex;align-items:baseline;gap:8px;margin:22px 4px 7px;font-size:13px;font-weight:650;color:var(--m-text2)}
+#cawf-panel.cawm .cawm-page>.cawm-h:first-child,#cawf-panel.cawm [data-dim]>.cawm-h:first-child{margin-top:22px}
+#cawf-panel.cawm .cawm-h small{font-size:11.5px;font-weight:400;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-note{margin:8px 4px 0;font-size:11.5px;line-height:1.5;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-note.top{margin:0 4px 12px}
+#cawf-panel.cawm .cawm-note a{color:var(--m-accent-text)}
+
+/* 묶음 목록 */
+#cawf-panel.cawm .cawm-group{border-radius:10px;background:var(--m-group);border:.5px solid var(--m-hair)}
+#cawf-panel.cawm .cawm-group+.cawm-group{margin-top:12px}
+#cawf-panel.cawm .cawm-row{min-height:44px;display:flex;align-items:center;gap:12px;padding:6px 12px}
+#cawf-panel.cawm .cawm-group>.cawm-row+.cawm-row,#cawf-panel.cawm .cawm-group>*+.cawm-row,#cawf-panel.cawm .cawm-mx+.cawm-mx{border-top:.5px solid var(--m-hair)}
+#cawf-panel.cawm .cawm-rl{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:13px;color:var(--m-text)}
+#cawf-panel.cawm .cawm-rl small{font-size:11.5px;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-row.result{min-height:34px}
+
+/* 스위치 */
+#cawf-panel.cawm .cawm-sw{position:relative;flex:none;width:32px;height:19px;padding:0;border:0;border-radius:999px;background:var(--m-off);transition:background .2s}
+#cawf-panel.cawm .cawm-sw::before{content:"";position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
+#cawf-panel.cawm .cawm-sw[aria-checked="true"]{background:var(--m-accent)}
+#cawf-panel.cawm .cawm-sw[aria-checked="true"]::before{transform:translateX(13px)}
+
+/* 세그먼트 */
+#cawf-panel.cawm .cawm-seg{flex:none;display:inline-flex;gap:2px;padding:2px;border-radius:7px;background:var(--m-elev2)}
+#cawf-panel.cawm .cawm-seg button{height:22px;padding:0 11px;border:0;border-radius:5px;background:transparent;font-size:12.5px;white-space:nowrap;color:var(--m-text)}
+#cawf-panel.cawm .cawm-seg button[aria-pressed="true"]{background:var(--m-seg-on);box-shadow:0 1px 2px rgba(0,0,0,.2);font-weight:600}
+
+/* 슬라이더 */
+#cawf-panel.cawm .cawm-slider{flex:0 1 230px;min-width:120px;display:flex;align-items:center;gap:10px}
+#cawf-panel.cawm .cawm-range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:4px;margin:0;border-radius:2px;background:linear-gradient(90deg,var(--m-accent) 0 var(--p,50%),var(--m-off) var(--p,50%) 100%);outline:none}
+#cawf-panel.cawm .cawm-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.3);cursor:pointer}
+#cawf-panel.cawm .cawm-range::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.3);cursor:pointer}
+#cawf-panel.cawm .cawm-out{flex:none;width:40px;text-align:right;font-size:12px;color:var(--m-text2);font-variant-numeric:tabular-nums}
+
+/* 버튼·입력 */
+#cawf-panel.cawm .cawm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:28px;padding:0 13px;border:0;border-radius:6px;background:var(--m-elev2);color:var(--m-text);font-size:13px;font-weight:500;white-space:nowrap;transition:filter .12s}
+#cawf-panel.cawm .cawm-btn:hover{filter:brightness(1.08)}
+#cawf-panel.cawm .cawm-btn:active{transform:scale(.98)}
+#cawf-panel.cawm .cawm-btn.primary{background:var(--m-accent);color:#fff;font-weight:600}
+#cawf-panel.cawm .cawm-btn.wide{width:100%;height:32px;margin-top:12px}
+#cawf-panel.cawm .cawm-btn svg{width:14px;height:14px}
+#cawf-panel.cawm .cawm-btn .cnt{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:rgba(255,255,255,.25);font-size:11px;line-height:16px;text-align:center}
+#cawf-panel.cawm .cawm-ib{flex:none;display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-ib:hover,#cawf-panel.cawm .cawm-ib[aria-expanded="true"]{background:var(--m-hover);color:var(--m-text)}
+#cawf-panel.cawm .cawm-ib svg{width:15px;height:15px}
+#cawf-panel.cawm .cawm-link{border:0;background:none;padding:0 2px;font-size:12px;color:var(--m-accent-text)}
+#cawf-panel.cawm .cawm-input{flex:1;min-width:0;height:28px;padding:0 8px;border:.5px solid var(--m-field);border-radius:6px;background:var(--m-elev);font-size:13px;outline:none}
+#cawf-panel.cawm .cawm-input:focus,#cawf-panel.cawm .cawm-textarea:focus{box-shadow:0 0 0 3px var(--m-ring)}
+#cawf-panel.cawm .cawm-input::placeholder,#cawf-panel.cawm .cawm-textarea::placeholder{color:var(--m-text3)}
+#cawf-panel.cawm .cawm-input.wide{width:100%}
+#cawf-panel.cawm .cawm-inline{display:flex;gap:6px;align-items:center}
+
+/* 고르는 칸 */
+#cawf-panel.cawm .cawm-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+#cawf-panel.cawm .cawm-cap{grid-column:1/-1;margin:6px 2px 0;font-size:11.5px;font-weight:600;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-tile{position:relative;display:flex;align-items:center;gap:7px;min-height:36px;padding:6px 9px;border:.5px solid var(--m-hair);border-radius:8px;background:var(--m-group);text-align:left;font-size:12.5px;color:var(--m-text)}
+#cawf-panel.cawm .cawm-tile:hover{background:var(--m-hover)}
+#cawf-panel.cawm .cawm-tile[aria-pressed="true"]{border-color:transparent;background:var(--m-accent-soft);box-shadow:inset 0 0 0 1.5px var(--m-accent);font-weight:600}
+#cawf-panel.cawm .cawm-tile[data-detected="true"]::after{content:"감지";position:absolute;top:-6px;right:6px;padding:0 5px;border-radius:6px;background:var(--m-ok);color:#fff;font-size:9.5px;font-weight:700;line-height:14px}
+#cawf-panel.cawm .cawm-tile .ti{flex:none;font-size:15px;line-height:1}
+#cawf-panel.cawm .cawm-tile .tl{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-tile .tl small{font-size:10.5px;font-weight:400;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-tile .tn{font-size:11px;color:var(--m-text3);font-variant-numeric:tabular-nums}
+#cawf-panel.cawm .cawm-tile[data-dirty="true"] .tn{color:var(--m-warn);font-weight:700}
+#cawf-panel.cawm .cawm-tile.sky .ti{display:grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--sky);font-size:13px}
+#cawf-panel.cawm .cawm-tiles.sm{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+#cawf-panel.cawm .cawm-tiles.kw{grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+
+/* 지금 상태 */
+#cawf-panel.cawm .cawm-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#cawf-panel.cawm .cawm-stat{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border-radius:10px;background:var(--m-group);border:.5px solid var(--m-hair);cursor:pointer}
+#cawf-panel.cawm .cawm-stat:hover{background:var(--m-hover)}
+#cawf-panel.cawm .cawm-stat .si{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--m-elev2);font-size:18px}
+#cawf-panel.cawm .cawm-stat .st{min-width:0;display:flex;flex-direction:column;gap:1px}
+#cawf-panel.cawm .cawm-stat small{font-size:11px;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-stat b{font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-stat em{font-style:normal;font-size:11px;color:var(--m-text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-eq{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+#cawf-panel.cawm .cawm-eq i{width:3px;height:30%;border-radius:1px;background:var(--m-text3)}
+#cawf-panel.cawm .cawm-eq[data-on="true"] i{background:var(--m-ok);animation:cawm-eq .9s ease-in-out infinite}
+#cawf-panel.cawm .cawm-eq[data-on="true"] i:nth-child(2){animation-delay:-.3s;animation-duration:.7s}
+#cawf-panel.cawm .cawm-eq[data-on="true"] i:nth-child(3){animation-delay:-.55s;animation-duration:1.1s}
+@keyframes cawm-eq{0%,100%{height:25%}50%{height:100%}}
+
+#cawf-panel.cawm .cawm-detail{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--m-group);border:.5px solid var(--m-hair)}
+#cawf-panel.cawm .cawm-detail>span:first-child{font-size:18px}
+#cawf-panel.cawm .cawm-detail>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+#cawf-panel.cawm .cawm-detail small{font-size:11.5px;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-pill{flex:none;padding:2px 8px;border-radius:999px;background:var(--m-elev2);font-size:11px;color:var(--m-text2)}
+#cawf-panel.cawm .cawm-pill[data-on="true"]{background:color-mix(in srgb,var(--m-ok) 18%,transparent);color:var(--m-ok)}
+
+#cawf-panel.cawm .cawm-banner{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--m-warn) 12%,var(--m-group));border:.5px solid color-mix(in srgb,var(--m-warn) 30%,transparent)}
+#cawf-panel.cawm .cawm-banner .bi{font-size:16px}
+#cawf-panel.cawm .cawm-banner .bt{flex:1;min-width:0;display:flex;flex-direction:column}
+#cawf-panel.cawm .cawm-banner small{font-size:11.5px;color:var(--m-text2)}
+
+/* 효과음 줄 */
+#cawf-panel.cawm .cawm-mx-n{flex:0 0 150px;min-width:0;display:flex;align-items:center;gap:9px}
+#cawf-panel.cawm .cawm-mx-n .mi{font-size:16px}
+#cawf-panel.cawm .cawm-mx-n>span:last-child{display:flex;flex-direction:column;min-width:0}
+#cawf-panel.cawm .cawm-mx-n small{font-size:11px;color:var(--m-text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-mx[data-state="play"] .cawm-mx-n small{color:var(--m-ok)}
+#cawf-panel.cawm .cawm-mx[data-state="error"] .cawm-mx-n small{color:var(--m-warn)}
+#cawf-panel.cawm .cawm-mixer .cawm-slider{flex:1 1 auto}
+#cawf-panel.cawm .cawm-mx-more{padding:0 12px 12px 37px;display:flex;flex-direction:column;gap:6px}
+#cawf-panel.cawm .cawm-mx-more .cawm-note{margin:0}
+
+/* 음악 */
+#cawf-panel.cawm .cawm-np{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px;border-radius:10px;background:var(--m-group);border:.5px solid var(--m-hair)}
+#cawf-panel.cawm .cawm-np-art{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:8px;background:var(--m-elev2);font-size:22px}
+#cawf-panel.cawm .cawm-np-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#cawf-panel.cawm .cawm-np-t b{font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-np-t small{font-size:11.5px;color:var(--m-text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cawf-panel.cawm .cawm-np .cawm-ib{width:30px;height:30px;color:var(--m-text)}
+#cawf-panel.cawm .cawm-np [data-cawf-bgm-toggle] .ic-pause{display:none}
+#cawf-panel.cawm .cawm-np[data-playing="true"] [data-cawf-bgm-toggle] .ic-pause{display:block}
+#cawf-panel.cawm .cawm-np[data-playing="true"] [data-cawf-bgm-toggle] .ic-play{display:none}
+#cawf-panel.cawm .cawm-urlrow{gap:6px}
+
+/* 키워드 편집 */
+#cawf-panel.cawm .cawm-editor{margin-top:12px}
+#cawf-panel.cawm .cawm-ed-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:.5px solid var(--m-hair)}
+#cawf-panel.cawm .cawm-ed-head b{font-size:13px}
+#cawf-panel.cawm .cawm-ed-head small{font-size:11.5px;color:var(--m-text3)}
+#cawf-panel.cawm .cawm-ed-head .sp{flex:1}
+#cawf-panel.cawm .cawm-tags{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 12px}
+#cawf-panel.cawm .cawfg-tag{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 4px 0 9px;border-radius:12px;background:var(--m-elev2);font-size:12px}
+#cawf-panel.cawm .cawfg-tag button{width:18px;height:18px;padding:0;border:0;border-radius:9px;background:transparent;color:var(--m-text3);font-size:13px;line-height:1}
+#cawf-panel.cawm .cawfg-tag button:hover{background:var(--m-hover);color:var(--m-danger)}
+#cawf-panel.cawm .cawfg-tag-in{flex:1 0 110px;height:24px;border:0;background:transparent;font-size:12px;outline:none;color:var(--m-text)}
+#cawf-panel.cawm .cawm-textarea{display:block;width:calc(100% - 24px);min-height:120px;margin:10px 12px 12px;padding:8px;border:.5px solid var(--m-field);border-radius:6px;background:var(--m-elev);font-size:12.5px;line-height:1.6;resize:vertical;outline:none;color:var(--m-text)}
+#cawf-panel.cawm .cawm-test-out{font-size:12px;color:var(--m-text2)}
+
+/* 좁은 창: 사이드바를 아이콘만 */
+@container cawmwin (max-width: 600px){
+  #cawf-panel.cawm .cawm-win{grid-template-columns:56px minmax(0,1fr)}
+  #cawf-panel.cawm .cawm-side{padding:14px 8px 10px}
+  #cawf-panel.cawm .cawm-lights{gap:5px;padding:0 0 16px;justify-content:center}
+  #cawf-panel.cawm .cawm-light{width:10px;height:10px}
+  #cawf-panel.cawm .cawm-tab{justify-content:center;padding:0;height:38px}
+  #cawf-panel.cawm .cawm-tab-l,#cawf-panel.cawm .cawm-ver{display:none}
+  #cawf-panel.cawm .cawm-tab-dot{position:absolute;top:5px;right:6px}
+  #cawf-panel.cawm .cawm-tab-ic{width:22px;height:22px}
+  #cawf-panel.cawm .cawm-scroll{padding:14px 12px 18px}
+  #cawf-panel.cawm .cawm-toolbar{padding:0 12px 0 14px}
+  #cawf-panel.cawm .cawm-stats{grid-template-columns:minmax(0,1fr)}
+  #cawf-panel.cawm .cawm-row{flex-wrap:wrap}
+  #cawf-panel.cawm .cawm-slider{flex:1 1 100%}
+  #cawf-panel.cawm .cawm-mx-n{flex:1 1 auto}
+  #cawf-panel.cawm .cawm-mixer .cawm-slider{order:3}
+  #cawf-panel.cawm .cawm-master>span{display:none}
+}
+@media (prefers-reduced-motion: reduce){#cawf-panel.cawm,#cawf-panel.cawm *{animation:none!important;transition:none!important}}
 `;
 
 
